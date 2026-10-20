@@ -1,0 +1,233 @@
+.page {
+  min-height: 100svh;
+  display: flex;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 15% 8%, rgb(13 168 167 / 16%), transparent 28rem),
+    #17252e;
+  color: #021b2b;
+}
+
+.phone {
+  width: min(100%, 430px);
+  min-height: 100svh;
+  padding: max(1rem, env(safe-area-inset-top)) 1.35rem max(2rem, env(safe-area-inset-bottom));
+  background: #fcfaf5;
+  box-shadow: 0 0 70px rgb(0 0 0 / 28%);
+}
+
+.compactPhone {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.brand {
+  display: grid;
+  justify-items: center;
+  padding: 0.2rem 0 1.05rem;
+}
+
+.logoCrop {
+  position: relative;
+  width: min(100%, 19.5rem);
+  height: 6.2rem;
+  overflow: hidden;
+}
+
+.logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 19.5rem;
+  max-width: none;
+  height: auto;
+  display: block;
+  transform: translate(-50%, -50%);
+}
+
+.brand p {
+  margin: 0.55rem 0 0;
+  color: #021b2b;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.headerSeparator {
+  width: min(100%, 15rem);
+  height: 1px;
+  margin-top: 0.15rem;
+  background: #021b2b;
+}
+
+.card {
+  border-radius: 1.65rem;
+}
+
+.title {
+  margin: 0;
+  padding: 1rem 1.5rem 0.85rem;
+  border-radius: 1.65rem 1.65rem 0 0;
+  border-bottom: 1px solid rgb(255 255 255 / 9%);
+  background: #021b2b;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.form { display: grid; }
+.formFields {
+  display: grid;
+  gap: 1.05rem;
+  padding: 1.5rem;
+  border-radius: 0 0 1.65rem 1.65rem;
+  background: #021b2b;
+  box-shadow: 0 1.1rem 2.6rem rgb(2 27 43 / 19%);
+}
+.field { display: grid; gap: 0.42rem; }
+.field label { color: #fff; font-size: 0.88rem; font-weight: 750; }
+
+.field input {
+  box-sizing: border-box;
+  display: block;
+  height: 3rem;
+  min-width: 0;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 0.85rem;
+  background: #fff;
+  padding: 0.72rem 0.9rem;
+  color: #021b2b;
+  font: inherit;
+  outline: none;
+  transition: border-color 140ms, box-shadow 140ms;
+}
+
+.field input:focus {
+  border-color: #1cc4c0;
+  box-shadow: 0 0 0 3px rgb(28 196 192 / 26%);
+}
+
+.field input[type="date"] {
+  min-width: 100%;
+  max-width: 100%;
+  color-scheme: light;
+}
+.field input[type="date"]::-webkit-date-and-time-value { min-height: 1.35rem; text-align: left; }
+.field input[aria-invalid="true"] { border-color: #ff8f7e; }
+.field input::placeholder { color: #7b858b; opacity: 1; }
+
+.passwordControl { position: relative; min-width: 0; }
+.passwordControl input { padding-right: 5.6rem; }
+.revealButton {
+  position: absolute;
+  top: 50%;
+  right: 0.45rem;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 0.55rem;
+  background: #e8f2f1;
+  padding: 0.42rem 0.55rem;
+  color: #075f63;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+.revealButton:hover { background: #d4ebe9; }
+.revealButton:focus-visible { outline: 3px solid #35d7d1; outline-offset: 2px; }
+.labelRow { display: flex; align-items: center; gap: 0.45rem; }
+.helpInfo { position: relative; display: inline-flex; }
+.infoButton {
+  width: 1.15rem;
+  height: 1.15rem;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 58%);
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font: 700 0.72rem/1 Georgia, serif;
+  cursor: help;
+}
+.infoButton:focus-visible { outline: 2px solid #00a09e; outline-offset: 2px; }
+.helpTooltip {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 0.45rem);
+  left: 50%;
+  width: max-content;
+  max-width: min(16rem, 72vw);
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.55rem;
+  background: #fff;
+  box-shadow: 0 0.65rem 1.4rem rgb(0 0 0 / 24%);
+  color: #021b2b;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -0.2rem);
+  transition: opacity 120ms, transform 120ms;
+}
+.helpInfo:hover .helpTooltip,
+.helpInfo:focus-within .helpTooltip { opacity: 1; transform: translate(-50%, 0); }
+.error { margin: 0; color: #ff9f91; font-size: 0.76rem; line-height: 1.35; }
+
+.notice { margin: 0; padding: 0.8rem 0.9rem; border-radius: 0.75rem; font-size: 0.78rem; line-height: 1.45; }
+.noticeError { background: rgb(255 104 85 / 14%); color: #ffc5bc; border: 1px solid rgb(255 104 85 / 30%); }
+.noticeSuccess { background: rgb(12 168 167 / 16%); color: #aff2ea; border: 1px solid rgb(12 168 167 / 32%); }
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  min-height: 2.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 140ms, box-shadow 140ms, opacity 140ms;
+}
+
+.primaryButton { border: 1px solid #021b2b; background: #021b2b; color: #fff; box-shadow: 0 0.65rem 1.3rem rgb(2 27 43 / 16%); }
+.secondaryButton { border: 1px solid #021b2b; background: transparent; color: #021b2b; }
+.primaryButton:hover, .secondaryButton:hover { transform: translateY(-1px); }
+.primaryButton:focus-visible, .secondaryButton:focus-visible { outline: 3px solid #35d7d1; outline-offset: 3px; }
+.primaryButton:disabled { cursor: wait; opacity: 0.62; transform: none; }
+
+.switch {
+  margin: 0.7rem 0 1.45rem;
+  padding: 0 1rem;
+  color: #514a5e;
+  font-size: 0.88rem;
+  text-align: center;
+}
+.switch a { display: block; color: #087c7a; font-weight: 850; text-decoration: none; }
+.switch a:hover { text-decoration: underline; }
+
+@media (max-width: 370px) {
+  .phone { padding-inline: 0.9rem; }
+  .logoCrop { width: min(100%, 17rem); height: 5.5rem; }
+  .logo { width: 17rem; }
+  .formFields { padding: 1.25rem; }
+}
+
+@media (min-width: 431px) {
+  .phone { border-inline: 1px solid rgb(255 255 255 / 12%); }
+}

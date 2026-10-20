@@ -1,4 +1,4 @@
-/** Types de notre premiere migration. A generer depuis Supabase quand le schema evoluera. */
+/** Types locaux. A regenerer depuis Supabase quand le schema evoluera. */
 export type Database = {
   public: {
     Tables: {
@@ -6,6 +6,42 @@ export type Database = {
         Row: { id: string; name: string };
         Insert: { id?: string; name: string };
         Update: { id?: string; name?: string };
+        Relationships: [];
+      };
+      profiles: {
+        Row: {
+          id: string;
+          username: string;
+          birth_date: string;
+          first_name: string | null;
+          last_name: string | null;
+          avatar_key: string | null;
+          biography: string | null;
+          location: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          username: string;
+          birth_date: string;
+          first_name?: string | null;
+          last_name?: string | null;
+          avatar_key?: string | null;
+          biography?: string | null;
+          location?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          username?: string;
+          first_name?: string | null;
+          last_name?: string | null;
+          avatar_key?: string | null;
+          biography?: string | null;
+          location?: string | null;
+          updated_at?: string;
+        };
         Relationships: [];
       };
     };

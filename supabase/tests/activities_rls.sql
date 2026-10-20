@@ -1,9 +1,9 @@
 -- Tests transactionnels : les comptes et fiches fictifs disparaissent au ROLLBACK.
 -- Executer dans SQL Editor en tant que postgres, apres la migration activities.
 begin;
-insert into auth.users(id, email) values
- ('90000000-0000-4000-8000-000000000001', 'asobi-rls-a@example.invalid'),
- ('90000000-0000-4000-8000-000000000002', 'asobi-rls-b@example.invalid');
+insert into auth.users(id, email, raw_user_meta_data) values
+ ('90000000-0000-4000-8000-000000000001', 'asobi-rls-a@example.invalid', '{"username":"asobi_rls_a","birth_date":"2000-01-01"}'),
+ ('90000000-0000-4000-8000-000000000002', 'asobi-rls-b@example.invalid', '{"username":"asobi_rls_b","birth_date":"2000-01-01"}');
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"90000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 insert into public.activities(title) values ('__asobi_rls_test__');
