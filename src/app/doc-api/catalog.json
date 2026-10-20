@@ -1,0 +1,939 @@
+[
+  {
+    "name": "users",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "email",
+        "type": "varchar(254)",
+        "required": true,
+        "note": "Adresse privee pour authentification et messages de service selon le mecanisme choisi ; normalisee et unique, jamais affichee comme contact public."
+      },
+      {
+        "name": "username",
+        "type": "varchar(40)",
+        "required": true,
+        "note": "Pseudo public unique pour identifier et rechercher les membres ; definir normalisation et sensibilite a la casse."
+      },
+      {
+        "name": "birth_date",
+        "type": "date",
+        "required": true,
+        "note": "Proposition pour calculer age courant : inscription des 16 ans et messagerie des 18 ans, sans stocker un age qui devient obsolete. Date privee, jamais exposee au profil. Declaration ne prouve pas age reel. Necessite de conserver la date complete et solution plus minimale a evaluer avant implementation."
+      },
+      {
+        "name": "first_name",
+        "type": "varchar(80)",
+        "required": false,
+        "note": "Prenom facultatif choisi par le membre ; non necessaire pour utiliser la plateforme, visibilite a definir."
+      },
+      {
+        "name": "last_name",
+        "type": "varchar(80)",
+        "required": false,
+        "note": "Nom facultatif ; ne pas imposer une identite civile pour un profil base sur le pseudo, visibilite a definir."
+      },
+      {
+        "name": "avatar_key",
+        "type": "text",
+        "required": false,
+        "note": "Reference du fichier avatar dans le stockage, plutot que image binaire en base ; photo reelle non obligatoire."
+      },
+      {
+        "name": "biography",
+        "type": "text",
+        "required": false,
+        "note": "Courte presentation publique pour permettre aux membres de se presenter."
+      },
+      {
+        "name": "location",
+        "type": "varchar(150)",
+        "required": false,
+        "note": "Localisation facultative, plutot ville ou zone que adresse precise ; affichage public a confirmer."
+      },
+      {
+        "name": "qualifications",
+        "type": "text",
+        "required": false,
+        "note": "Qualifications ou diplomes utiles ; texte libre en V1, a structurer ensuite si un filtre fiable devient necessaire."
+      },
+      {
+        "name": "experience",
+        "type": "text",
+        "required": false,
+        "note": "Description facultative du parcours dans animation ; texte libre simple pour la V1."
+      },
+      {
+        "name": "availability",
+        "type": "text",
+        "required": false,
+        "note": "Disponibilites facultatives du membre ; texte libre en V1, pas encore un calendrier recherchable."
+      },
+      {
+        "name": "bank_unlocked_at",
+        "type": "timestamptz",
+        "required": false,
+        "note": "Date du premier deblocage apres approbation de la contribution publique ; conserve le droit acquis meme si la fiche est ensuite retiree. NULL signifie non debloque."
+      },
+      {
+        "name": "suspended_at",
+        "type": "timestamptz",
+        "required": false,
+        "note": "Date de suspension du compte ; permet au serveur de refuser les actions sans supprimer immediatement le compte. NULL signifie non suspendu."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de derniere modification ; a actualiser par le serveur ou un declencheur, car la valeur par defaut ne suffit pas."
+      }
+    ]
+  },
+  {
+    "name": "roles",
+    "fields": [
+      {
+        "name": "code",
+        "type": "varchar(30)",
+        "required": false,
+        "note": "Nom stable du droit : member, recruiter ou admin. Le role recruteur permet de publier des offres ; attribution encore a definir."
+      }
+    ]
+  },
+  {
+    "name": "user_roles",
+    "fields": [
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Identifie le membre concerne par cette association."
+      },
+      {
+        "name": "role_code",
+        "type": "varchar(30)",
+        "required": true,
+        "note": "Role attribue au membre ; cette table permet de cumuler membre et recruteur sans creer plusieurs comptes."
+      }
+    ]
+  },
+  {
+    "name": "categories",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "name",
+        "type": "varchar(80)",
+        "required": true,
+        "note": "Libelle unique propose pour classer les activites, par exemple jeu collectif ou expression ; vocabulaire a definir."
+      }
+    ]
+  },
+  {
+    "name": "activities",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "author_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Identifie le membre auteur pour afficher attribution et verifier ses droits de modification."
+      },
+      {
+        "name": "category_id",
+        "type": "uuid",
+        "required": false,
+        "note": "Categorie de la fiche pour classement et filtre. Nullable pour enregistrer un brouillon incomplet ; requise avant publication si cette regle est retenue."
+      },
+      {
+        "name": "title",
+        "type": "varchar(180)",
+        "required": true,
+        "note": "Titre court pour les resultats de recherche ; le brouillon doit deja posseder un titre dans cette proposition."
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "required": false,
+        "note": "Resume pour expliquer rapidement le principe de activite ; contenu de apercu public a definir."
+      },
+      {
+        "name": "age_min",
+        "type": "int",
+        "required": false,
+        "note": "Age minimum recommande du public, en annees ; sert au filtre et ne concerne pas age du compte."
+      },
+      {
+        "name": "age_max",
+        "type": "int",
+        "required": false,
+        "note": "Age maximum recommande du public ; doit etre superieur ou egal au minimum."
+      },
+      {
+        "name": "participants_min",
+        "type": "int",
+        "required": false,
+        "note": "Effectif minimum recommande pour permettre de rechercher selon la taille du groupe."
+      },
+      {
+        "name": "participants_max",
+        "type": "int",
+        "required": false,
+        "note": "Effectif maximum recommande ; ne remplace pas les regles encadrement ou adaptation au contexte."
+      },
+      {
+        "name": "duration_minutes",
+        "type": "int",
+        "required": false,
+        "note": "Duree estimee en minutes, unite commune pour trier et filtrer sans interpreter un texte libre."
+      },
+      {
+        "name": "environment",
+        "type": "environment",
+        "required": false,
+        "note": "Lieu de pratique : indoor, outdoor ou both, pour filtrer interieur et exterieur."
+      },
+      {
+        "name": "preparation",
+        "type": "varchar(5000)",
+        "required": false,
+        "note": "Texte de preparation de activite, limite a 5000 caracteres. Meme limite a appliquer dans le formulaire et la validation serveur."
+      },
+      {
+        "name": "safety",
+        "type": "text",
+        "required": false,
+        "note": "Precautions et points de vigilance transmis par auteur ; presence du champ ne garantit pas la securite de activite."
+      },
+      {
+        "name": "visibility",
+        "type": "visibility",
+        "required": true,
+        "note": "Intention de partage : private ou public. Distincte du statut : une fiche publique en brouillon ne doit pas etre visible par tous."
+      },
+      {
+        "name": "status",
+        "type": "publication_status",
+        "required": true,
+        "note": "Etape du cycle : draft, pending, published, rejected, hidden. Sert aux autorisations et a la moderation."
+      },
+      {
+        "name": "published_at",
+        "type": "timestamptz",
+        "required": false,
+        "note": "Date de publication pour afficher et trier les contenus ; politique de premiere publication ou republication a fixer."
+      },
+      {
+        "name": "deleted_at",
+        "type": "timestamptz",
+        "required": false,
+        "note": "Date de retrait logique ; exclut la fiche des consultations courantes. Conservation et effacement definitif restent a definir."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de derniere modification ; a actualiser par le serveur ou un declencheur, car la valeur par defaut ne suffit pas."
+      }
+    ]
+  },
+  {
+    "name": "pedagogical_objectives",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant stable du mot-cle pedagogique."
+      },
+      {
+        "name": "name",
+        "type": "varchar(100)",
+        "required": true,
+        "note": "Objectif reutilisable, par exemple cooperation, autonomie ou creativite. Normaliser les libelles pour limiter les doublons."
+      }
+    ]
+  },
+  {
+    "name": "activity_objectives",
+    "fields": [
+      {
+        "name": "activity_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Fiche associee a cet objectif pedagogique."
+      },
+      {
+        "name": "objective_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Objectif selectionne dans le nuage de mots de la fiche."
+      }
+    ]
+  },
+  {
+    "name": "equipment_items",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant stable du mot-cle de materiel."
+      },
+      {
+        "name": "name",
+        "type": "varchar(100)",
+        "required": true,
+        "note": "Materiel reutilisable, par exemple ballon, corde ou papier. Normaliser les libelles pour limiter les doublons."
+      }
+    ]
+  },
+  {
+    "name": "activity_equipment",
+    "fields": [
+      {
+        "name": "activity_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Fiche pour laquelle ce materiel est necessaire."
+      },
+      {
+        "name": "equipment_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Materiel selectionne dans le nuage de mots de la fiche."
+      }
+    ]
+  },
+  {
+    "name": "activity_images",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "activity_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Cle etrangere reliant cet enregistrement a la fiche activite concernee."
+      },
+      {
+        "name": "storage_key",
+        "type": "text",
+        "required": true,
+        "note": "Cle du fichier dans un stockage objet ; permet une diffusion controlee, y compris pour les fiches privees."
+      },
+      {
+        "name": "alt_text",
+        "type": "varchar(250)",
+        "required": false,
+        "note": "Description textuelle de image pour accessibilite ; a renseigner pour les images informatives."
+      },
+      {
+        "name": "position",
+        "type": "int",
+        "required": true,
+        "note": "Ordre affiche des images, propose a partir de zero ; utile pour une galerie ordonnee."
+      }
+    ]
+  },
+  {
+    "name": "activity_reviews",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "activity_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Cle etrangere reliant cet enregistrement a la fiche activite concernee."
+      },
+      {
+        "name": "reviewer_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Administrateur ayant pris la decision ; permet attribution et tracabilite."
+      },
+      {
+        "name": "decision",
+        "type": "varchar(20)",
+        "required": true,
+        "note": "Resultat approved ou rejected. Proposition actuelle en texte : contraindre ces valeurs avant production."
+      },
+      {
+        "name": "feedback",
+        "type": "text",
+        "required": false,
+        "note": "Explication de la decision et corrections demandees a auteur."
+      },
+      {
+        "name": "reviewed_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de decision pour historique de moderation et deblocage de la banque."
+      }
+    ]
+  },
+  {
+    "name": "favorites",
+    "fields": [
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Identifie le membre concerne par cette association."
+      },
+      {
+        "name": "activity_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Cle etrangere reliant cet enregistrement a la fiche activite concernee."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      }
+    ]
+  },
+  {
+    "name": "friendships",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "user_low_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Premier membre de la paire : UUID le plus petit pour toujours ranger les deux membres dans le meme ordre. Aucun rapport avec son age."
+      },
+      {
+        "name": "user_high_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Second membre de la paire : UUID le plus grand. Avec le premier et un index unique, evite les doublons A-B et B-A."
+      },
+      {
+        "name": "requested_by",
+        "type": "uuid",
+        "required": true,
+        "note": "Parmi les deux membres, celui qui a envoye la demande ; permet de savoir qui doit accepter."
+      },
+      {
+        "name": "status",
+        "type": "friendship_status",
+        "required": true,
+        "note": "Etat pending, accepted ou declined ; seuls les amis accepted sont eligibles au partage prive."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      },
+      {
+        "name": "responded_at",
+        "type": "timestamptz",
+        "required": false,
+        "note": "Date de reponse a la demande ; NULL tant que la demande attend une reponse."
+      }
+    ]
+  },
+  {
+    "name": "activity_shares",
+    "fields": [
+      {
+        "name": "activity_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Cle etrangere reliant cet enregistrement a la fiche activite concernee."
+      },
+      {
+        "name": "recipient_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Membre destinataire ; permet de limiter acces a la personne autorisee."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      }
+    ]
+  },
+  {
+    "name": "comments",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "activity_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Cle etrangere reliant cet enregistrement a la fiche activite concernee."
+      },
+      {
+        "name": "author_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Identifie le membre auteur pour afficher attribution et verifier ses droits de modification."
+      },
+      {
+        "name": "body",
+        "type": "text",
+        "required": true,
+        "note": "Contenu textuel saisi ; verifier longueur, contenu non vide et affichage sans execution de HTML utilisateur."
+      },
+      {
+        "name": "hidden_at",
+        "type": "timestamptz",
+        "required": false,
+        "note": "Date de masquage par moderation ; NULL signifie non masque. Ne constitue pas un effacement definitif."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de derniere modification ; a actualiser par le serveur ou un declencheur, car la valeur par defaut ne suffit pas."
+      }
+    ]
+  },
+  {
+    "name": "comment_replies",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "comment_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Commentaire auquel repond auteur de la fiche ; table separee pour un seul niveau de reponse."
+      },
+      {
+        "name": "author_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Identifie le membre auteur pour afficher attribution et verifier ses droits de modification."
+      },
+      {
+        "name": "body",
+        "type": "text",
+        "required": true,
+        "note": "Contenu textuel saisi ; verifier longueur, contenu non vide et affichage sans execution de HTML utilisateur."
+      },
+      {
+        "name": "hidden_at",
+        "type": "timestamptz",
+        "required": false,
+        "note": "Date de masquage par moderation ; NULL signifie non masque. Ne constitue pas un effacement definitif."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      }
+    ]
+  },
+  {
+    "name": "offers",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "recruiter_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Auteur de offre ; doit posseder le role recruteur, controle serveur et non garanti par la seule cle etrangere."
+      },
+      {
+        "name": "title",
+        "type": "varchar(180)",
+        "required": true,
+        "note": "Intitule general du sejour ou du recrutement dans les resultats."
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "required": false,
+        "note": "Presentation du sejour, de la structure et du contexte de travail."
+      },
+      {
+        "name": "location",
+        "type": "varchar(180)",
+        "required": false,
+        "note": "Lieu du sejour ou du poste ; texte libre en V1, geographie structuree a envisager pour filtrer par distance."
+      },
+      {
+        "name": "starts_on",
+        "type": "date",
+        "required": false,
+        "note": "Date de debut du sejour ou de la periode concernee ; permet le filtre par dates."
+      },
+      {
+        "name": "ends_on",
+        "type": "date",
+        "required": false,
+        "note": "Date de fin ; doit etre posterieure ou egale a la date de debut."
+      },
+      {
+        "name": "audience_description",
+        "type": "text",
+        "required": false,
+        "note": "Public accueilli, par exemple tranche age et caracteristiques utiles du sejour."
+      },
+      {
+        "name": "lodging",
+        "type": "text",
+        "required": false,
+        "note": "Conditions de logement proposees aux personnes recrutees."
+      },
+      {
+        "name": "transport",
+        "type": "text",
+        "required": false,
+        "note": "Conditions de transport ou prise en charge pour rejoindre le lieu de travail."
+      },
+      {
+        "name": "contact_email",
+        "type": "varchar(254)",
+        "required": false,
+        "note": "Adresse de candidature choisie par recruteur, visible sur offre publiee ; peut differer de son email de connexion prive."
+      },
+      {
+        "name": "status",
+        "type": "offer_status",
+        "required": true,
+        "note": "Etat draft, published, closed ou hidden ; permet de retirer les offres pourvues et de moderer."
+      },
+      {
+        "name": "published_at",
+        "type": "timestamptz",
+        "required": false,
+        "note": "Date de publication pour afficher et trier les contenus ; politique de premiere publication ou republication a fixer."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de derniere modification ; a actualiser par le serveur ou un declencheur, car la valeur par defaut ne suffit pas."
+      }
+    ]
+  },
+  {
+    "name": "offer_positions",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "offer_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Offre parente ; permet de proposer plusieurs types de postes dans une seule offre."
+      },
+      {
+        "name": "title",
+        "type": "varchar(120)",
+        "required": true,
+        "note": "Intitule du poste, par exemple animateur ou direction adjointe."
+      },
+      {
+        "name": "quantity",
+        "type": "int",
+        "required": true,
+        "note": "Nombre de personnes recherchees pour ce type de poste, strictement positif."
+      },
+      {
+        "name": "contract_type",
+        "type": "varchar(80)",
+        "required": false,
+        "note": "Type de contrat annonce ; texte libre provisoire, liste controlee souhaitable pour les filtres."
+      },
+      {
+        "name": "remuneration_amount",
+        "type": "decimal(10,2)",
+        "required": false,
+        "note": "Montant numerique annonce pour ce poste ; decimal evite les approximations des nombres flottants."
+      },
+      {
+        "name": "remuneration_unit",
+        "type": "varchar(40)",
+        "required": false,
+        "note": "Unite et base du montant, par exemple EUR brut par jour ; nomenclature a definir pour eviter les comparaisons trompeuses."
+      },
+      {
+        "name": "qualifications",
+        "type": "text",
+        "required": false,
+        "note": "Qualifications ou diplomes utiles ; texte libre en V1, a structurer ensuite si un filtre fiable devient necessaire."
+      },
+      {
+        "name": "beginners_accepted",
+        "type": "boolean",
+        "required": true,
+        "note": "Indique si les debutants sont acceptes et alimente le filtre stagiaire. False par defaut est une proposition a confirmer ; imposer un choix explicite dans le formulaire."
+      }
+    ]
+  },
+  {
+    "name": "blocks",
+    "fields": [
+      {
+        "name": "blocker_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Membre qui decide de bloquer un autre membre."
+      },
+      {
+        "name": "blocked_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Membre bloque ; ne peut pas etre identique a auteur du blocage."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      }
+    ]
+  },
+  {
+    "name": "direct_conversations",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "user_low_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Premier membre de la paire : UUID le plus petit pour toujours ranger les deux membres dans le meme ordre. Aucun rapport avec son age."
+      },
+      {
+        "name": "user_high_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Second membre de la paire : UUID le plus grand. Avec le premier et un index unique, evite les doublons A-B et B-A."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      }
+    ]
+  },
+  {
+    "name": "messages",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "conversation_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Conversation contenant le message ; utilise pour charger uniquement les messages des participants autorises."
+      },
+      {
+        "name": "sender_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Membre ayant envoye le message ; doit appartenir a la conversation et etre majeur, verification serveur."
+      },
+      {
+        "name": "body",
+        "type": "text",
+        "required": true,
+        "note": "Contenu textuel saisi ; verifier longueur, contenu non vide et affichage sans execution de HTML utilisateur."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      }
+    ]
+  },
+  {
+    "name": "notifications",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "recipient_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Membre destinataire ; permet de limiter acces a la personne autorisee."
+      },
+      {
+        "name": "type",
+        "type": "varchar(60)",
+        "required": true,
+        "note": "Nature de evenement, par exemple demande amitie ou fiche approuvee ; catalogue des valeurs a definir."
+      },
+      {
+        "name": "payload",
+        "type": "jsonb",
+        "required": false,
+        "note": "Petites donnees JSON pour identifier evenement et cible. Ne pas copier de contenu prive ; verifier les droits au moment de ouverture."
+      },
+      {
+        "name": "read_at",
+        "type": "timestamptz",
+        "required": false,
+        "note": "Date de lecture ; NULL indique une notification non lue et permet de calculer le compteur."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      }
+    ]
+  },
+  {
+    "name": "reports",
+    "fields": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "required": false,
+        "note": "Identifiant technique unique de cette ligne ; UUID pour referencer sans utiliser un nom modifiable. Il ne remplace pas un controle de permissions."
+      },
+      {
+        "name": "reporter_id",
+        "type": "uuid",
+        "required": true,
+        "note": "Membre ayant signale le contenu ; reserve a administration pour traitement."
+      },
+      {
+        "name": "activity_id",
+        "type": "uuid",
+        "required": false,
+        "note": "Fiche signalee ; renseignee uniquement si la cible est une activite."
+      },
+      {
+        "name": "offer_id",
+        "type": "uuid",
+        "required": false,
+        "note": "Offre signalee ; renseignee uniquement si la cible est une offre. La contrainte impose exactement une cible."
+      },
+      {
+        "name": "reason",
+        "type": "text",
+        "required": true,
+        "note": "Motif et contexte du signalement pour permettre examen par administrateur."
+      },
+      {
+        "name": "status",
+        "type": "report_status",
+        "required": true,
+        "note": "Etat pending, reviewed ou dismissed pour suivre le traitement."
+      },
+      {
+        "name": "handled_by",
+        "type": "uuid",
+        "required": false,
+        "note": "Administrateur ayant traite le signalement ; NULL avant prise de decision."
+      },
+      {
+        "name": "resolution",
+        "type": "text",
+        "required": false,
+        "note": "Decision motivee ou action entreprise pour tracer le traitement."
+      },
+      {
+        "name": "handled_at",
+        "type": "timestamptz",
+        "required": false,
+        "note": "Date du traitement ; NULL tant que le signalement attend une decision."
+      },
+      {
+        "name": "created_at",
+        "type": "timestamptz",
+        "required": true,
+        "note": "Date de creation pour suivre la chronologie et trier les enregistrements."
+      }
+    ]
+  }
+]
