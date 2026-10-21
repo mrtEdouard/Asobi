@@ -130,9 +130,20 @@
 .photoSection { margin-top: 22px; }
 .photoSection h2 { margin-bottom: 9px; color: #08273a; font-size: 14px; font-weight: 850; }
 .photoGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.photoGrid > div { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 15px; background: #dbe6e4; }
-.photoGrid > div:only-child { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
+.photoGrid > button { position: relative; aspect-ratio: 4 / 3; overflow: hidden; padding: 0; border-radius: 15px; background: #dbe6e4; cursor: zoom-in; }
+.photoGrid > button:only-child { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
+.photoGrid > button:focus-visible { outline: 3px solid rgba(11,153,151,.35); outline-offset: 2px; }
 .photoGrid img { object-fit: cover; }
+.lightbox { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: #000; color: #fff; }
+.lightbox::backdrop { background: rgba(0,0,0,.92); }
+.lightbox figure { position: absolute; inset: 56px 0; margin: 0; touch-action: pinch-zoom; }
+.lightbox figure img { object-fit: contain; }
+.lightbox figcaption { position: absolute; bottom: -38px; left: 50%; color: rgba(255,255,255,.75); font-size: 12px; font-weight: 700; transform: translateX(-50%); }
+.lightbox > button { position: absolute; display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; background: rgba(255,255,255,.14); color: #fff; font-size: 28px; line-height: 1; }
+.lightboxClose { top: max(10px, env(safe-area-inset-top)); right: 10px; }
+.lightboxPrevious, .lightboxNext { top: 50%; transform: translateY(-50%); }
+.lightboxPrevious { left: 8px; }
+.lightboxNext { right: 8px; }
 .deleteForm { margin-top: 24px; padding-top: 18px; border-top: 1px solid #e3e1e4; }
 .deleteForm button { width: 100%; min-height: 44px; border: 1px solid #d45145; border-radius: 999px; background: #fff; color: #b33c33; font-size: 11px; font-weight: 850; }
 .deleteForm button:disabled { opacity: .55; }

@@ -10,6 +10,7 @@ import { getActivityAuthors, getActivityGalleryCounts, getActivityTags } from ".
 import { getActivityImages } from "../activity-images";
 import { DeleteActivityButton } from "../delete-activity-button";
 import { GalleryCount } from "../gallery-count";
+import { PhotoGallery } from "../photo-gallery";
 import styles from "../activities.module.css";
 
 type Params = Promise<{ id: string }>;
@@ -80,9 +81,7 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
         {photos.length > 0 && (
           <section className={styles.photoSection} aria-labelledby="activity-photos">
             <h2 id="activity-photos">En images</h2>
-            <div className={styles.photoGrid}>
-              {photos.map((photo, index) => <div key={photo.id}><Image src={photo.url} alt={`Photo ${index + 1} de l’activité ${activity.title}`} fill unoptimized sizes="210px" /></div>)}
-            </div>
+            <PhotoGallery photos={photos} title={activity.title} />
           </section>
         )}
         {photos.length === 0 && isOwner && <p className={styles.photoHint}><Link href={`/activites/${id}/modifier`}>Ajouter des photos</Link> pour illustrer ta fiche.</p>}
