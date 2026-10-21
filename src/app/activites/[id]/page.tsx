@@ -37,7 +37,7 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
 
   return (
     <AppShell>
-      <div className={styles.detailNav}><Link href="/activites?vue=mes">← Galerie</Link>{isOwner && <Link href={`/activites/${id}/modifier`} className={styles.editButton}>Modifier</Link>}</div>
+      <div className={styles.detailNav}><Link href={`/activites?vue=${activity.visibility === "public" ? "communaute" : "mes"}`}>← {activity.visibility === "public" ? "Communauté" : "Galerie"}</Link>{isOwner && <Link href={`/activites/${id}/modifier`} className={styles.editButton}>Modifier</Link>}</div>
       {query.modification === "ok" && <p className={styles.success}>Les modifications ont été enregistrées.</p>}
       <article className={styles.detail}>
         <div className={styles.cardTopline}><span>{category?.name ?? "Sans catégorie"}</span><b>{activity.visibility === "public" ? "Publique" : "Privée"}</b></div>

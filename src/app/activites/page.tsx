@@ -10,6 +10,8 @@ type SearchParams = Promise<{
   vue?: string;
   creation?: string;
   copie?: string;
+  publication?: string;
+  modification?: string;
   q?: string;
   categorie?: string;
   environnement?: string;
@@ -32,8 +34,8 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
 
   let activitiesQuery = supabase.from("activities").select("*").is("deleted_at", null).order("created_at", { ascending: false });
   activitiesQuery = community
-    ? activitiesQuery.eq("visibility", "public").neq("author_id", user.id)
-    : activitiesQuery.eq("author_id", user.id);
+    ? activitiesQuery.eq("visibility", "public")
+    : activitiesQuery.eq("author_id", user.id).eq("visibility", "private");
 
   const [{ data: activities }, { data: categories }] = await Promise.all([
     activitiesQuery,
@@ -68,6 +70,8 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
       </nav>
 
       {(params.creation === "ok" || params.copie === "ok") && <p className={styles.success}>{params.creation === "ok" ? "L’activité a été ajoutée à ta galerie." : "La copie a été ajoutée à ta galerie privée."}</p>}
+      {params.publication === "ok" && <p className={styles.success}>L’activité a été publiée dans la communauté.</p>}
+      {params.modification === "ok" && <p className={styles.success}>L’activité est maintenant publique et visible par la communauté.</p>}
 
       <form className={styles.filters} method="get">
         <input type="hidden" name="vue" value={community ? "communaute" : "mes"} />
@@ -102,7 +106,7 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
                 {activity.participants_min != null && activity.participants_max != null && <span>{activity.participants_min}–{activity.participants_max} pers.</span>}
               </div>
             </Link>
-            {community && <form action={copyActivityAction}><input type="hidden" name="activityId" value={activity.id} /><button type="submit">Ajouter à ma galerie</button></form>}
+            {community && activity.author_id !== user.id && <form action={copyActivityAction}><input type="hidden" name="activityId" value={activity.id} /><button type="submit">Ajouter à ma galerie</button></form>}
           </article>
         ))}
       </section>

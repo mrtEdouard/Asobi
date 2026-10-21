@@ -97,7 +97,10 @@ export async function createActivityAction(
   }
 
   revalidatePath("/activites");
-  redirect("/activites?vue=mes&creation=ok");
+  revalidatePath("/compte");
+  redirect(activity.visibility === "public"
+    ? "/activites?vue=communaute&publication=ok"
+    : "/activites?vue=mes&creation=ok");
 }
 
 export async function updateActivityAction(
@@ -141,8 +144,11 @@ export async function updateActivityAction(
   }
 
   revalidatePath("/activites");
+  revalidatePath("/compte");
   revalidatePath(`/activites/${activityId.data}`);
-  redirect(`/activites/${activityId.data}?modification=ok`);
+  redirect(activity.visibility === "public"
+    ? "/activites?vue=communaute&modification=ok"
+    : `/activites/${activityId.data}?modification=ok`);
 }
 
 export async function copyActivityAction(formData: FormData) {

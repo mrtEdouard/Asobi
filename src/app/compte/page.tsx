@@ -26,13 +26,16 @@ export default function AccountPage() {
 async function Home() {
   const user = await requireUser();
   const supabase = await createClient();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile }, { data: recentActivities }, { data: categories }] = await Promise.all([
+    supabase.from("profiles").select("username").eq("id", user.id).single(),
+    supabase.from("activities").select("*").eq("visibility", "public").is("deleted_at", null).order("published_at", { ascending: false }).limit(6),
+    supabase.from("categories").select("id,name"),
+  ]);
 
   const username = profile?.username ?? user.user_metadata?.username ?? "";
+  const categoryNames = new Map((categories ?? []).map((category) => [category.id, category.name]));
+  const activityImages = ["/images/cards/activite-fresque.webp", "/images/cards/activite-explorateurs.webp"];
+  const environmentNames = { indoor: "Intérieur", outdoor: "Extérieur", both: "Intérieur/extérieur" };
 
   return (
     <main className={styles.viewport}>
@@ -49,33 +52,29 @@ async function Home() {
           <section className={styles.section} aria-labelledby="activities-title">
             <div className={styles.sectionHeading}>
               <h2 id="activities-title">Dernières activités partagées</h2>
-              <Link href="/activites" className={styles.seeAll}>Tout voir <ArrowIcon /></Link>
+              <Link href="/activites?vue=communaute" className={styles.seeAll}>Tout voir <ArrowIcon /></Link>
             </div>
             <div className={styles.carousel} aria-label="Activités récentes">
-              <article className={styles.activityCard}>
-                <div className={styles.activityVisual}>
-                  <Image className={styles.cardImage} src="/images/cards/activite-fresque.webp" alt="Des enfants réalisent ensemble une fresque colorée" fill sizes="180px" />
-                  <span className={styles.activityBadge}>6–10 ans</span>
-                </div>
-                <div className={styles.cardBody}>
-                  <div className={styles.tags}><span>Créativité</span><span>Intérieur</span></div>
-                  <h3>La fresque des émotions</h3>
-                  <p>Une activité collective pour créer, échanger et mieux se connaître.</p>
-                  <div className={styles.meta}><span>⏱ 45 min</span><span>👥 6–16</span></div>
-                </div>
-              </article>
-              <article className={styles.activityCard}>
-                <div className={styles.activityVisual}>
-                  <Image className={styles.cardImage} src="/images/cards/activite-explorateurs.webp" alt="Des enfants participent à un jeu d’orientation en plein air" fill sizes="180px" />
-                  <span className={styles.activityBadge}>8–12 ans</span>
-                </div>
-                <div className={styles.cardBody}>
-                  <div className={styles.tags}><span>Coopération</span><span>Extérieur</span></div>
-                  <h3>Le défi des explorateurs</h3>
-                  <p>Des énigmes en équipe pour observer, s’orienter et relever des défis.</p>
-                  <div className={styles.meta}><span>⏱ 60 min</span><span>👥 8–20</span></div>
-                </div>
-              </article>
+              {!recentActivities?.length ? <p className={styles.carouselEmpty}>Les prochaines activités partagées apparaîtront ici.</p> : recentActivities.map((activity, index) => (
+                <Link href={`/activites/${activity.id}`} className={styles.activityCard} key={activity.id}>
+                  <div className={styles.activityVisual}>
+                    <Image className={styles.cardImage} src={activityImages[index % activityImages.length]} alt="" fill sizes="180px" />
+                    {activity.age_min != null && activity.age_max != null && <span className={styles.activityBadge}>{activity.age_min}–{activity.age_max} ans</span>}
+                  </div>
+                  <div className={styles.cardBody}>
+                    <div className={styles.tags}>
+                      <span>{categoryNames.get(activity.category_id ?? "") ?? "Activité"}</span>
+                      {activity.environment && <span>{environmentNames[activity.environment]}</span>}
+                    </div>
+                    <h3>{activity.title}</h3>
+                    <p>{activity.description}</p>
+                    <div className={styles.meta}>
+                      {activity.duration_minutes && <span>⏱ {activity.duration_minutes} min</span>}
+                      {activity.participants_min != null && activity.participants_max != null && <span>👥 {activity.participants_min}–{activity.participants_max}</span>}
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           </section>
 

@@ -14,7 +14,8 @@
 .seeAll svg, .offerArrow svg { width: 16px; height: 16px; }
 .carousel { display: flex; width: 100%; gap: 10px; overflow-x: auto; overscroll-behavior-inline: contain; padding: 1px 0 14px; scroll-snap-type: inline mandatory; scrollbar-width: none; }
 .carousel::-webkit-scrollbar { display: none; }
-.activityCard { flex: 0 0 calc(50% - 5px); min-width: 0; overflow: hidden; border: 1px solid #dedede; border-radius: 17px; background: #ededed; box-shadow: 0 8px 20px rgba(0,0,0,.07); scroll-snap-align: start; }
+.activityCard { flex: 0 0 calc(50% - 5px); min-width: 0; overflow: hidden; border: 1px solid #dedede; border-radius: 17px; background: #ededed; box-shadow: 0 8px 20px rgba(0,0,0,.07); color: inherit; scroll-snap-align: start; text-decoration: none; }
+.carouselEmpty { width: 100%; padding: 24px 18px; border: 1px dashed #d7dfe0; border-radius: 15px; color: #697982; font-size: 11px; line-height: 1.5; text-align: center; }
 .activityVisual { position: relative; height: 104px; overflow: hidden; background: #dbe6e4; }
 .cardImage { object-fit: cover; }
 .activityBadge { position: absolute; top: 8px; right: 8px; padding: 4px 7px; border-radius: 999px; background: rgba(255,255,255,.94); color: #08273a; font-size: 9px; font-weight: 800; }
