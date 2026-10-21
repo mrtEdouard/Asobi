@@ -39,11 +39,18 @@
 .bubbleChoice input:checked + span { border-color: #0b9997; background: #0b9997; box-shadow: 0 5px 12px rgba(11,153,151,.2); color: #fff; transform: translateY(-1px); }
 .bubbleChoice input:focus-visible + span { outline: 3px solid rgba(11,153,151,.25); outline-offset: 2px; }
 .bubbleChoice:active span { transform: scale(.97); }
+.addBubble { display: grid; grid-template-columns: 1fr 42px; gap: 7px; margin-top: 2px; }
+.addBubble input { width: 100%; min-width: 0; min-height: 42px; border: 1px solid #d5d2d8; border-radius: 12px; background: #fff; padding: 10px 12px; color: #08273a; font: inherit; font-size: 12px; outline: none; }
+.addBubble input:focus { border-color: #0b9997; box-shadow: 0 0 0 3px rgba(11,153,151,.14); }
+.addBubble button { display: grid; min-height: 42px; place-items: center; border-radius: 12px; background: #08273a; color: #fff; font-size: 21px; font-weight: 500; }
+.pickerHelp, .groupHint, .visibilityHint { color: #7a858b; font-size: 9px; font-weight: 500; line-height: 1.4; }
 .twoColumns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .group { margin: 0; padding: 0; border: 0; }
 .group legend, .visibility legend { margin-bottom: 7px; color: #08273a; font-size: 12px; font-weight: 800; }
+.groupHint { margin: -3px 0 8px; }
 .visibility { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; padding: 0; border: 0; }
 .visibility legend { grid-column: 1 / -1; }
+.visibilityHint { grid-column: 1 / -1; margin-top: -4px; }
 .visibility label { position: relative; cursor: pointer; }
 .visibility input { position: absolute; opacity: 0; }
 .visibility span { display: grid; min-height: 70px; align-content: center; gap: 3px; padding: 10px; border: 1px solid #d5d2d8; border-radius: 13px; background: #fff; color: #08273a; }
