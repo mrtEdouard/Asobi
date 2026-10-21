@@ -21,6 +21,27 @@ type SearchParams = Promise<{
   tri?: string;
 }>;
 
+const environmentPhrases = { indoor: "en intérieur", outdoor: "en extérieur", both: "en intérieur ou en extérieur" };
+
+/** Presentation rapide : « Pour les 10–12 ans, de 12 à 20 participants, environ 60 min en extérieur. » */
+function activitySummary(activity: {
+  age_min: number | null;
+  age_max: number | null;
+  participants_min: number | null;
+  participants_max: number | null;
+  duration_minutes: number | null;
+  environment: keyof typeof environmentPhrases | null;
+}) {
+  const parts = [
+    activity.age_min != null && activity.age_max != null && `pour les ${activity.age_min}–${activity.age_max} ans`,
+    activity.participants_min != null && activity.participants_max != null && `de ${activity.participants_min} à ${activity.participants_max} participants`,
+    activity.duration_minutes && `environ ${activity.duration_minutes} min${activity.environment ? ` ${environmentPhrases[activity.environment]}` : ""}`,
+  ].filter(Boolean);
+  if (!parts.length) return null;
+  const sentence = parts.join(", ");
+  return `${sentence.charAt(0).toUpperCase()}${sentence.slice(1)}.`;
+}
+
 function normalized(value: string) {
   return value.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLocaleLowerCase("fr");
 }
@@ -105,25 +126,33 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
           </div>
         ) : filteredActivities.map((activity) => (
           <article className={styles.activityCard} key={activity.id}>
-            <Link href={`/activites/${activity.id}`} className={styles.cardLink} aria-label={`Consulter ${activity.title}`}>
-              <div className={styles.cardTopline}><span>{categoryNames.get(activity.category_id ?? "") ?? "Sans catégorie"}</span><b>{activity.visibility === "public" ? "Publique" : "Privée"}</b></div>
-              <h2>{activity.title}</h2>
-              <p className={styles.author}>Par @{authorNames.get(activity.author_id) ?? "membre"}</p>
-              {activity.description && <p>{activity.description}</p>}
-              <div className={styles.cardMeta}>
-                {activity.age_min != null && activity.age_max != null && <span>{activity.age_min}–{activity.age_max} ans</span>}
-                {activity.duration_minutes && <span>{activity.duration_minutes} min</span>}
-                {activity.participants_min != null && activity.participants_max != null && <span>{activity.participants_min}–{activity.participants_max} pers.</span>}
-                {activity.visibility === "public" && <span>{galleryCounts.get(activity.source_activity_id ?? activity.id) ?? 0} ajout{(galleryCounts.get(activity.source_activity_id ?? activity.id) ?? 0) > 1 ? "s" : ""}</span>}
+            <div className={styles.cardTopline}>
+              <span>{categoryNames.get(activity.category_id ?? "") ?? "Sans catégorie"}</span>
+              <div className={styles.cardStatus}>
+                {activity.visibility === "public" && (
+                  <span className={styles.cardHearts} aria-label={`Ajoutée ${galleryCounts.get(activity.source_activity_id ?? activity.id) ?? 0} fois en galerie`}>
+                    <span aria-hidden="true">♡</span>{galleryCounts.get(activity.source_activity_id ?? activity.id) ?? 0}
+                  </span>
+                )}
+                <b>{activity.visibility === "public" ? "Publique" : "Privée"}</b>
               </div>
-            </Link>
-            {activity.author_id === user.id ? (
-              <div className={styles.cardActions}>
-                <Link href={`/activites/${activity.id}/modifier`}>Modifier</Link>
-                <DeleteActivityButton activityId={activity.id} isCopy={Boolean(activity.source_activity_id)} compact />
+            </div>
+            <div className={styles.cardBody}>
+              <div className={styles.cardMain}>
+                <h2><Link href={`/activites/${activity.id}`} className={styles.cardLink}>{activity.title}</Link></h2>
+                <p className={styles.author}>Par @{authorNames.get(activity.author_id) ?? "membre"}</p>
+                {activity.description && <p className={styles.cardDescription}>{activity.description}</p>}
+                {activitySummary(activity) && <p className={styles.cardSummary}>{activitySummary(activity)}</p>}
               </div>
-            ) : community && (
-              <form action={copyActivityAction}><input type="hidden" name="activityId" value={activity.id} /><button type="submit">Ajouter à ma galerie</button></form>
+              {activity.author_id === user.id && (
+                <div className={styles.cardActions}>
+                  <Link href={`/activites/${activity.id}/modifier`}>Modifier</Link>
+                  <DeleteActivityButton activityId={activity.id} isCopy={Boolean(activity.source_activity_id)} compact />
+                </div>
+              )}
+            </div>
+            {activity.author_id !== user.id && community && (
+              <form action={copyActivityAction} className={styles.copyForm}><input type="hidden" name="activityId" value={activity.id} /><button type="submit">Ajouter à ma galerie</button></form>
             )}
           </article>
         ))}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import { createActivityAction, updateActivityAction, type ActivityActionState } from "../actions";
 import styles from "../activities.module.css";
+import { ImageFields, type ExistingImages } from "./image-fields";
 
 type Category = { id: string; name: string };
 export type ActivityFormValues = {
@@ -217,7 +218,7 @@ function BubblePicker({
   );
 }
 
-export function ActivityForm({ categories, activity }: { categories: Category[]; activity?: ActivityFormValues }) {
+export function ActivityForm({ categories, activity, images }: { categories: Category[]; activity?: ActivityFormValues; images?: ExistingImages }) {
   const [state, action, pending] = useActionState(activity ? updateActivityAction : createActivityAction, initialState);
 
   return (
@@ -260,6 +261,8 @@ export function ActivityForm({ categories, activity }: { categories: Category[];
       />
       <div className={styles.field}><FieldHeading htmlFor="preparation" help="Obligatoire. Décris les préparatifs, les règles et les étapes dans l’ordre, en 10 à 5 000 caractères.">Préparation et déroulement</FieldHeading><textarea id="preparation" name="preparation" rows={8} maxLength={5000} placeholder="Explique les préparatifs, les règles puis les étapes dans l’ordre." defaultValue={activity?.preparation} required /><ErrorMessage state={state} name="preparation" /></div>
       <div className={styles.field}><FieldHeading htmlFor="safety" help="Obligatoire. Précise les risques, les règles de sécurité et les adaptations nécessaires, en 5 à 3 000 caractères.">Sécurité et points de vigilance</FieldHeading><textarea id="safety" name="safety" rows={4} maxLength={3000} placeholder="Précise les risques, les règles de sécurité et les adaptations nécessaires." defaultValue={activity?.safety} required /><ErrorMessage state={state} name="safety" /></div>
+
+      <ImageFields existing={images} errors={state.errors} />
 
       <fieldset className={styles.visibility}><legend><span>Qui peut voir cette activité&nbsp;?</span><InfoTip text="Obligatoire. Choisis privée ou publique ; tu pourras modifier ce choix plus tard." /></legend>
         <label><input type="radio" name="visibility" value="private" defaultChecked={!activity || activity.visibility === "private"} /><span><strong>Privée</strong><small>Uniquement dans ma galerie</small></span></label>

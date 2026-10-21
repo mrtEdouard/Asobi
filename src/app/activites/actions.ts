@@ -3,8 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { GALLERY_MAX_PHOTOS } from "@/lib/activity-images/rules";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { deleteActivityImages, filesFromFormData, saveActivityImages, validateImage, type ValidImage } from "./activity-images";
 
 export type ActivityActionState = {
   status: "idle" | "error";
@@ -57,21 +59,55 @@ function errorState(message: string, errors?: Record<string, string[]>): Activit
   return { status: "error", message, errors };
 }
 
+/** Valide la couverture et les nouvelles photos avant tout enregistrement. */
+async function imagesFromFormData(formData: FormData, keptPhotos: number) {
+  const errors: Record<string, string[]> = {};
+  const coverFile = filesFromFormData(formData, "coverImage")[0];
+  const photoFiles = filesFromFormData(formData, "photos");
+
+  let cover: ValidImage | undefined;
+  if (coverFile) {
+    const result = await validateImage(coverFile);
+    if (typeof result === "string") errors.coverImage = [result];
+    else cover = result;
+  }
+
+  const photos: ValidImage[] = [];
+  if (keptPhotos + photoFiles.length > GALLERY_MAX_PHOTOS) {
+    errors.photos = [`La galerie est limitée à ${GALLERY_MAX_PHOTOS} photos.`];
+  } else {
+    for (const file of photoFiles) {
+      const result = await validateImage(file);
+      if (typeof result === "string") {
+        errors.photos = [result];
+        break;
+      }
+      photos.push(result);
+    }
+  }
+
+  return { cover, photos, errors: Object.keys(errors).length ? errors : undefined };
+}
+
 export async function createActivityAction(
   _state: ActivityActionState,
   formData: FormData,
 ): Promise<ActivityActionState> {
-  await requireUser();
+  const user = await requireUser();
 
   const parsed = activitySchema.safeParse(activityFromFormData(formData));
+  const images = await imagesFromFormData(formData, 0);
 
-  if (!parsed.success) {
-    return errorState("Vérifie les champs du formulaire.", parsed.error.flatten().fieldErrors);
+  if (!parsed.success || images.errors) {
+    return errorState("Vérifie les champs du formulaire.", {
+      ...(parsed.success ? {} : parsed.error.flatten().fieldErrors),
+      ...images.errors,
+    });
   }
 
   const activity = parsed.data;
   const supabase = await createClient();
-  const { error } = await supabase.rpc("create_activity_with_tags", {
+  const { data: createdId, error } = await supabase.rpc("create_activity_with_tags", {
     p_category_id: activity.categoryId,
     p_title: activity.title,
     p_description: activity.description,
@@ -96,8 +132,11 @@ export async function createActivityAction(
     return errorState("L’activité n’a pas pu être enregistrée. Réessaie dans un instant.");
   }
 
+  const imagesSaved = await saveActivityImages(supabase, user.id, createdId, images);
+
   revalidatePath("/activites");
   revalidatePath("/compte");
+  if (!imagesSaved) redirect(`/activites/${createdId}?images=erreur`);
   redirect(activity.visibility === "public"
     ? "/activites?vue=communaute&publication=ok"
     : "/activites?vue=mes&creation=ok");
@@ -107,19 +146,31 @@ export async function updateActivityAction(
   _state: ActivityActionState,
   formData: FormData,
 ): Promise<ActivityActionState> {
-  await requireUser();
+  const user = await requireUser();
   const activityId = z.string().uuid().safeParse(formData.get("activityId"));
+  const removedImageIds = z.array(z.string().uuid()).max(20).safeParse(formData.getAll("removeImageIds"));
   const parsed = activitySchema.safeParse(activityFromFormData(formData));
 
-  if (!activityId.success || !parsed.success) {
-    return errorState(
-      "Vérifie les champs du formulaire.",
-      parsed.success ? undefined : parsed.error.flatten().fieldErrors,
-    );
+  if (!activityId.success || !removedImageIds.success) {
+    return errorState("Vérifie les champs du formulaire.");
+  }
+
+  const supabase = await createClient();
+  const { data: currentImages } = await supabase
+    .from("activity_images")
+    .select("id,is_cover")
+    .eq("activity_id", activityId.data);
+  const keptPhotos = (currentImages ?? []).filter((image) => !image.is_cover && !removedImageIds.data.includes(image.id)).length;
+  const images = await imagesFromFormData(formData, keptPhotos);
+
+  if (!parsed.success || images.errors) {
+    return errorState("Vérifie les champs du formulaire.", {
+      ...(parsed.success ? {} : parsed.error.flatten().fieldErrors),
+      ...images.errors,
+    });
   }
 
   const activity = parsed.data;
-  const supabase = await createClient();
   const { error } = await supabase.rpc("update_activity_with_tags", {
     p_activity_id: activityId.data,
     p_category_id: activity.categoryId,
@@ -143,9 +194,18 @@ export async function updateActivityAction(
     return errorState("Les modifications n’ont pas pu être enregistrées.");
   }
 
+  // Une nouvelle couverture remplace l'ancienne.
+  const imageIdsToDelete = [
+    ...removedImageIds.data,
+    ...(images.cover ? (currentImages ?? []).filter((image) => image.is_cover).map((image) => image.id) : []),
+  ];
+  const imagesDeleted = await deleteActivityImages(supabase, activityId.data, [...new Set(imageIdsToDelete)]);
+  const imagesSaved = imagesDeleted && await saveActivityImages(supabase, user.id, activityId.data, images);
+
   revalidatePath("/activites");
   revalidatePath("/compte");
   revalidatePath(`/activites/${activityId.data}`);
+  if (!imagesSaved) redirect(`/activites/${activityId.data}?images=erreur`);
   redirect(activity.visibility === "public"
     ? "/activites?vue=communaute&modification=ok"
     : `/activites/${activityId.data}?modification=ok`);

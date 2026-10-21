@@ -80,6 +80,18 @@ export type Database = {
         Update: { activity_id?: string; equipment_id?: string };
         Relationships: [];
       };
+      activity_images: {
+        Row: {
+          id: string;
+          activity_id: string;
+          storage_path: string;
+          is_cover: boolean;
+          created_at: string;
+        };
+        Insert: { activity_id: string; storage_path: string; is_cover?: boolean };
+        Update: { [_ in never]: never };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           id: string;
@@ -142,6 +154,10 @@ export type Database = {
         Returns: string;
       };
       copy_public_activity: { Args: { p_source_id: string }; Returns: string };
+      delete_activity_images: {
+        Args: { p_activity_id: string; p_image_ids: string[] };
+        Returns: string[];
+      };
       get_activity_authors: {
         Args: { p_activity_ids: string[] };
         Returns: { id: string; username: string }[];
