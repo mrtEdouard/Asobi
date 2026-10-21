@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -5,11 +6,12 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "../../compte/app-shell";
-import { getActivityAuthors, getActivityTags } from "../activity-data";
+import { getActivityAuthors, getActivityGalleryCounts, getActivityTags } from "../activity-data";
+import { DeleteActivityButton } from "../delete-activity-button";
 import styles from "../activities.module.css";
 
 type Params = Promise<{ id: string }>;
-type SearchParams = Promise<{ modification?: string }>;
+type SearchParams = Promise<{ modification?: string; suppression?: string }>;
 
 const environmentNames = { indoor: "Intérieur", outdoor: "Extérieur", both: "Intérieur et extérieur" };
 
@@ -27,23 +29,33 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
   const { data: activity } = await supabase.from("activities").select("*").eq("id", id).is("deleted_at", null).maybeSingle();
   if (!activity) notFound();
 
-  const [{ data: category }, tags, authorNames] = await Promise.all([
+  const rootActivityId = activity.source_activity_id ?? activity.id;
+  const [{ data: category }, tags, authorNames, galleryCounts] = await Promise.all([
     activity.category_id
       ? supabase.from("categories").select("name").eq("id", activity.category_id).maybeSingle()
       : Promise.resolve({ data: null }),
     getActivityTags(supabase, id),
     getActivityAuthors(supabase, [id]),
+    getActivityGalleryCounts(supabase, [rootActivityId]),
   ]);
   const isOwner = activity.author_id === user.id;
+  const galleryCount = galleryCounts.get(rootActivityId) ?? 0;
+  const mainImage = activity.id.charCodeAt(0) % 2 === 0 ? "/images/cards/activite-fresque.webp" : "/images/cards/activite-explorateurs.webp";
+  const secondaryImage = mainImage === "/images/cards/activite-fresque.webp" ? "/images/cards/activite-explorateurs.webp" : "/images/cards/activite-fresque.webp";
 
   return (
     <AppShell>
       <div className={styles.detailNav}><Link href={`/activites?vue=${activity.visibility === "public" ? "communaute" : "mes"}`}>← {activity.visibility === "public" ? "Communauté" : "Galerie"}</Link>{isOwner && <Link href={`/activites/${id}/modifier`} className={styles.editButton}>Modifier</Link>}</div>
       {query.modification === "ok" && <p className={styles.success}>Les modifications ont été enregistrées.</p>}
+      {query.suppression === "erreur" && <p className={styles.errorNotice}>L’activité n’a pas pu être supprimée.</p>}
       <article className={styles.detail}>
-        <div className={styles.cardTopline}><span>{category?.name ?? "Sans catégorie"}</span><b>{activity.visibility === "public" ? "Publique" : "Privée"}</b></div>
-        <h1>{activity.title}</h1>
-        <p className={styles.detailAuthor}>Une activité proposée par <strong>@{authorNames.get(activity.author_id) ?? "membre"}</strong></p>
+        <div className={styles.detailHero}>
+          <Image src={mainImage} alt={`Illustration de l’activité ${activity.title}`} fill priority sizes="430px" />
+          <div className={styles.heroShade} />
+          <div className={styles.heroBadges}><span>{category?.name ?? "Sans catégorie"}</span><b>{activity.visibility === "public" ? "Publique" : "Privée"}</b></div>
+          <div className={styles.heroTitle}><h1>{activity.title}</h1><p>Par <strong>@{authorNames.get(activity.author_id) ?? "membre"}</strong></p></div>
+        </div>
+        <div className={styles.galleryCount}><span aria-hidden="true">♡</span><div><strong>{galleryCount}</strong><small>{galleryCount > 1 ? "personnes ont" : "personne a"} ajouté cette activité à leur galerie</small></div></div>
         <p className={styles.detailDescription}>{activity.description}</p>
         <div className={styles.detailMeta}>
           <div><small>Âge</small><strong>{activity.age_min}–{activity.age_max} ans</strong></div>
@@ -55,6 +67,8 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
         <DetailSection title="Matériel" tags={tags.equipment} />
         <DetailSection title="Préparation et déroulement" text={activity.preparation} />
         <DetailSection title="Sécurité et points de vigilance" text={activity.safety} />
+        <section className={styles.photoSection} aria-labelledby="activity-photos"><h2 id="activity-photos">En images</h2><div className={styles.photoGrid}><div><Image src={secondaryImage} alt="Ambiance de l’activité" fill sizes="210px" /></div><div><Image src={mainImage} alt="Mise en situation de l’activité" fill sizes="210px" /></div></div></section>
+        {isOwner && <DeleteActivityButton activityId={activity.id} isCopy={Boolean(activity.source_activity_id)} />}
       </article>
     </AppShell>
   );

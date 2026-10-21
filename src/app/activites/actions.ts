@@ -161,5 +161,27 @@ export async function copyActivityAction(formData: FormData) {
   if (error) return;
 
   revalidatePath("/activites");
+  revalidatePath("/compte");
+  revalidatePath(`/activites/${parsed.data}`);
   redirect("/activites?vue=mes&copie=ok");
+}
+
+export async function deleteActivityAction(formData: FormData) {
+  await requireUser();
+  const parsed = z.string().uuid().safeParse(formData.get("activityId"));
+  if (!parsed.success) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("remove_activity_from_gallery", {
+    p_activity_id: parsed.data,
+  });
+
+  if (error) {
+    console.error("Activity removal failed", { code: error.code, message: error.message });
+    redirect(`/activites/${parsed.data}?suppression=erreur`);
+  }
+
+  revalidatePath("/activites");
+  revalidatePath("/compte");
+  redirect("/activites?vue=mes&suppression=ok");
 }

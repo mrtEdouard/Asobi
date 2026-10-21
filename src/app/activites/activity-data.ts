@@ -48,3 +48,24 @@ export async function getActivityAuthors(
 
   return new Map((data ?? []).map((author) => [author.id, author.username]));
 }
+
+export async function getActivityGalleryCounts(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  activityIds: string[],
+) {
+  if (!activityIds.length) return new Map<string, number>();
+
+  const { data, error } = await supabase.rpc("get_activity_gallery_counts", {
+    p_activity_ids: [...new Set(activityIds)],
+  });
+
+  if (error) {
+    console.error("Activity gallery counts could not be loaded", {
+      code: error.code,
+      message: error.message,
+    });
+    return new Map<string, number>();
+  }
+
+  return new Map((data ?? []).map((item) => [item.activity_id, Number(item.save_count)]));
+}

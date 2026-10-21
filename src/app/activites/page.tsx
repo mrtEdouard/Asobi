@@ -4,7 +4,7 @@ import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "../compte/app-shell";
 import { copyActivityAction } from "./actions";
-import { getActivityAuthors } from "./activity-data";
+import { getActivityAuthors, getActivityGalleryCounts } from "./activity-data";
 import styles from "./activities.module.css";
 
 type SearchParams = Promise<{
@@ -13,6 +13,7 @@ type SearchParams = Promise<{
   copie?: string;
   publication?: string;
   modification?: string;
+  suppression?: string;
   q?: string;
   categorie?: string;
   environnement?: string;
@@ -43,7 +44,11 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
     supabase.from("categories").select("id,name").order("name"),
   ]);
   const categoryNames = new Map((categories ?? []).map((category) => [category.id, category.name]));
-  const authorNames = await getActivityAuthors(supabase, (activities ?? []).map((activity) => activity.id));
+  const rootActivityIds = (activities ?? []).map((activity) => activity.source_activity_id ?? activity.id);
+  const [authorNames, galleryCounts] = await Promise.all([
+    getActivityAuthors(supabase, (activities ?? []).map((activity) => activity.id)),
+    getActivityGalleryCounts(supabase, rootActivityIds),
+  ]);
   const search = (params.q ?? "").trim().slice(0, 80);
   const categoryFilter = params.categorie ?? "";
   const environmentFilter = params.environnement ?? "";
@@ -74,6 +79,7 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
       {(params.creation === "ok" || params.copie === "ok") && <p className={styles.success}>{params.creation === "ok" ? "L’activité a été ajoutée à ta galerie." : "La copie a été ajoutée à ta galerie privée."}</p>}
       {params.publication === "ok" && <p className={styles.success}>L’activité a été publiée dans la communauté.</p>}
       {params.modification === "ok" && <p className={styles.success}>L’activité est maintenant publique et visible par la communauté.</p>}
+      {params.suppression === "ok" && <p className={styles.success}>L’activité a été retirée de ta galerie.</p>}
 
       <form className={styles.filters} method="get">
         <input type="hidden" name="vue" value={community ? "communaute" : "mes"} />
@@ -107,6 +113,7 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
                 {activity.age_min != null && activity.age_max != null && <span>{activity.age_min}–{activity.age_max} ans</span>}
                 {activity.duration_minutes && <span>{activity.duration_minutes} min</span>}
                 {activity.participants_min != null && activity.participants_max != null && <span>{activity.participants_min}–{activity.participants_max} pers.</span>}
+                {activity.visibility === "public" && <span>{galleryCounts.get(activity.source_activity_id ?? activity.id) ?? 0} ajout{(galleryCounts.get(activity.source_activity_id ?? activity.id) ?? 0) > 1 ? "s" : ""}</span>}
               </div>
             </Link>
             {community && activity.author_id !== user.id && <form action={copyActivityAction}><input type="hidden" name="activityId" value={activity.id} /><button type="submit">Ajouter à ma galerie</button></form>}

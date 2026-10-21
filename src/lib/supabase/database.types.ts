@@ -146,6 +146,11 @@ export type Database = {
         Args: { p_activity_ids: string[] };
         Returns: { id: string; username: string }[];
       };
+      get_activity_gallery_counts: {
+        Args: { p_activity_ids: string[] };
+        Returns: { activity_id: string; save_count: number }[];
+      };
+      remove_activity_from_gallery: { Args: { p_activity_id: string }; Returns: string };
       update_activity_with_tags: {
         Args: {
           p_activity_id: string;
