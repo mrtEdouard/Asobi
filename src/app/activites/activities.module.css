@@ -1,0 +1,50 @@
+.loading { display: grid; min-height: 100svh; place-items: center; background: #fff; color: #08273a; font-weight: 750; }
+.pageHeader { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-top: 24px; }
+.pageHeader p, .formHeader > p { margin-bottom: 3px; color: #0b9997; font-size: 10px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.pageHeader h1, .formHeader h1 { color: #08273a; font-size: 28px; font-weight: 880; letter-spacing: -.045em; }
+.addButton { padding: 9px 15px; border-radius: 999px; background: #08010e; color: #fff; font-size: 12px; font-weight: 800; text-decoration: none; }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; margin-top: 22px; padding: 4px; border-radius: 13px; background: #eeeaf0; }
+.tabs a { padding: 9px 7px; border-radius: 10px; color: #746e78; font-size: 12px; font-weight: 800; text-align: center; text-decoration: none; }
+.tabs .activeTab { background: #08010e; box-shadow: 0 5px 13px rgba(8,1,14,.18); color: #fff; }
+.success { margin-top: 14px; padding: 10px 12px; border-radius: 11px; background: #e9f6f4; color: #087f80; font-size: 11px; font-weight: 750; }
+.list { display: grid; gap: 12px; margin-top: 17px; }
+.activityCard { padding: 16px; border: 1px solid #dedde0; border-radius: 17px; background: #fff; box-shadow: 0 8px 22px rgba(8,39,58,.07); }
+.cardTopline { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #0b8585; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+.cardTopline b { padding: 4px 7px; border-radius: 999px; background: #f0edf2; color: #706777; font-size: 8px; }
+.activityCard h2 { margin-top: 9px; color: #08273a; font-size: 17px; font-weight: 850; letter-spacing: -.025em; }
+.activityCard > p { display: -webkit-box; margin-top: 5px; overflow: hidden; color: #687780; font-size: 11px; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.cardMeta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; }
+.cardMeta span { padding: 5px 8px; border-radius: 999px; background: #e9f6f4; color: #087f80; font-size: 9px; font-weight: 800; }
+.activityCard form { margin-top: 13px; }
+.activityCard form button { width: 100%; padding: 9px; border-radius: 999px; background: #08010e; color: #fff; font-size: 11px; font-weight: 800; }
+.empty { display: grid; justify-items: center; gap: 7px; padding: 40px 20px; border: 1px dashed #d8d3dc; border-radius: 18px; color: #687780; text-align: center; }
+.empty h2 { color: #08273a; font-size: 17px; }
+.empty p { max-width: 245px; font-size: 11px; line-height: 1.5; }
+.empty a { margin-top: 5px; padding: 9px 14px; border-radius: 999px; background: #08010e; color: #fff; font-size: 11px; font-weight: 800; text-decoration: none; }
+.formHeader { margin: 24px 0 20px; }
+.formHeader > span { display: block; margin-top: 6px; color: #687780; font-size: 12px; line-height: 1.45; }
+.form { display: grid; gap: 16px; }
+.field, .group label { display: grid; gap: 6px; color: #08273a; font-size: 12px; font-weight: 800; }
+.field input, .field textarea, .field select, .group input { width: 100%; min-width: 0; border: 1px solid #d5d2d8; border-radius: 12px; background: #fff; padding: 11px 12px; color: #08273a; font: inherit; font-size: 13px; font-weight: 500; outline: none; }
+.field textarea { resize: vertical; line-height: 1.5; }
+.field input:focus, .field textarea:focus, .field select:focus, .group input:focus { border-color: #0b9997; box-shadow: 0 0 0 3px rgba(11,153,151,.14); }
+.field small { color: #7a858b; font-size: 9px; font-weight: 500; }
+.twoColumns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.group { margin: 0; padding: 0; border: 0; }
+.group legend, .visibility legend { margin-bottom: 7px; color: #08273a; font-size: 12px; font-weight: 800; }
+.visibility { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; padding: 0; border: 0; }
+.visibility legend { grid-column: 1 / -1; }
+.visibility label { position: relative; cursor: pointer; }
+.visibility input { position: absolute; opacity: 0; }
+.visibility span { display: grid; min-height: 70px; align-content: center; gap: 3px; padding: 10px; border: 1px solid #d5d2d8; border-radius: 13px; background: #fff; color: #08273a; }
+.visibility strong { font-size: 12px; }
+.visibility small { color: #748087; font-size: 9px; line-height: 1.35; }
+.visibility input:checked + span { border-color: #08010e; background: #08010e; color: #fff; }
+.visibility input:checked + span small { color: rgba(255,255,255,.7); }
+.fieldError { color: #b9362c; font-size: 9px; font-weight: 650; }
+.formError { padding: 11px; border-radius: 11px; background: #fff0ee; color: #a93128; font-size: 11px; }
+.formActions { display: grid; grid-template-columns: 1fr 1.35fr; gap: 9px; margin-top: 2px; }
+.formActions a, .formActions button { display: grid; min-height: 45px; place-items: center; border: 1px solid #08010e; border-radius: 999px; font-size: 12px; font-weight: 850; text-decoration: none; }
+.formActions a { background: transparent; color: #08010e; }
+.formActions button { background: #08010e; color: #fff; }
+.formActions button:disabled { opacity: .55; }
