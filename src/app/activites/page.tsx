@@ -7,6 +7,7 @@ import { saveActivityAction, unsaveActivityAction } from "./actions";
 import { getActivityAuthors, getActivityGalleryCounts } from "./activity-data";
 import { DeleteActivityButton } from "./delete-activity-button";
 import { NoticeToast } from "./notice-toast";
+import { SubmitButton } from "./submit-button";
 import styles from "./activities.module.css";
 
 type SearchParams = Promise<{
@@ -166,7 +167,7 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
                 <form action={unsaveActivityAction} className={styles.cardActions}>
                   <input type="hidden" name="activityId" value={activity.id} />
                   <input type="hidden" name="returnTo" value="mes" />
-                  <button type="submit" className={styles.unsaveCompact}>Retirer</button>
+                  <SubmitButton className={styles.unsaveCompact} pendingLabel="…">Retirer</SubmitButton>
                 </form>
               )}
             </div>
@@ -174,7 +175,7 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
               <form action={isSaved ? unsaveActivityAction : saveActivityAction} className={styles.copyForm}>
                 <input type="hidden" name="activityId" value={activity.id} />
                 <input type="hidden" name="returnTo" value="communaute" />
-                <button type="submit" className={isSaved ? styles.savedButton : undefined}>{isSaved ? "♥ Dans ma galerie · Retirer" : "Ajouter à ma galerie"}</button>
+                <SubmitButton className={isSaved ? styles.savedButton : undefined} pendingLabel={isSaved ? "Retrait…" : "Ajout…"}>{isSaved ? "♥ Dans ma galerie · Retirer" : "Ajouter à ma galerie"}</SubmitButton>
               </form>
             )}
           </article>

@@ -70,13 +70,29 @@ export type Database = {
         Row: { activity_id: string; objective_id: string };
         Insert: { activity_id: string; objective_id: string };
         Update: { activity_id?: string; objective_id?: string };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "activity_objectives_objective_id_fkey";
+            columns: ["objective_id"];
+            isOneToOne: false;
+            referencedRelation: "pedagogical_objectives";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       activity_equipment: {
         Row: { activity_id: string; equipment_id: string };
         Insert: { activity_id: string; equipment_id: string };
         Update: { activity_id?: string; equipment_id?: string };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "activity_equipment_equipment_id_fkey";
+            columns: ["equipment_id"];
+            isOneToOne: false;
+            referencedRelation: "equipment_items";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       activity_images: {
         Row: {

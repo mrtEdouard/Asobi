@@ -33,7 +33,7 @@ async function Home() {
     supabase.from("categories").select("id,name"),
   ]);
 
-  const username = profile?.username ?? user.user_metadata?.username ?? "";
+  const username = profile?.username ?? String(user.user_metadata.username ?? "");
   const authorNames = await getActivityAuthors(supabase, (recentActivities ?? []).map((activity) => activity.id));
   const categoryNames = new Map((categories ?? []).map((category) => [category.id, category.name]));
   const activityImages = ["/images/cards/activite-fresque.webp", "/images/cards/activite-explorateurs.webp"];

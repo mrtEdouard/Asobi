@@ -12,6 +12,7 @@ import { getActivityImages } from "../activity-images";
 import { DeleteActivityButton } from "../delete-activity-button";
 import { GalleryCount } from "../gallery-count";
 import { NoticeToast } from "../notice-toast";
+import { SubmitButton } from "../submit-button";
 import { PhotoGallery } from "../photo-gallery";
 import styles from "../activities.module.css";
 
@@ -31,19 +32,19 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
   if (!z.string().uuid().safeParse(id).success) notFound();
 
   const supabase = await createClient();
-  const { data: activity } = await supabase.from("activities").select("*").eq("id", id).is("deleted_at", null).maybeSingle();
-  if (!activity) notFound();
-
-  const [{ data: category }, tags, authorNames, galleryCounts, images, { data: save }] = await Promise.all([
-    activity.category_id
-      ? supabase.from("categories").select("name").eq("id", activity.category_id).maybeSingle()
-      : Promise.resolve({ data: null }),
+  // Toutes les lectures ne dependent que de l'identifiant : elles partent en parallele.
+  // La RLS filtre chacune d'elles, une fiche non visible renvoie donc des resultats vides.
+  const [{ data: activity }, { data: categories }, tags, authorNames, galleryCounts, images, { data: save }] = await Promise.all([
+    supabase.from("activities").select("*").eq("id", id).is("deleted_at", null).maybeSingle(),
+    supabase.from("categories").select("id,name"),
     getActivityTags(supabase, id),
     getActivityAuthors(supabase, [id]),
     getActivityGalleryCounts(supabase, [id]),
     getActivityImages(supabase, [id]),
     supabase.from("activity_saves").select("activity_id").eq("user_id", user.id).eq("activity_id", id).maybeSingle(),
   ]);
+  if (!activity) notFound();
+  const category = (categories ?? []).find((item) => item.id === activity.category_id);
   const isOwner = activity.author_id === user.id;
   const galleryCount = galleryCounts.get(id) ?? 0;
   const isSaved = Boolean(save);
@@ -73,7 +74,7 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
           <form action={isSaved ? unsaveActivityAction : saveActivityAction} className={styles.saveForm}>
             <input type="hidden" name="activityId" value={activity.id} />
             <input type="hidden" name="returnTo" value="fiche" />
-            <button type="submit" className={isSaved ? styles.savedButton : undefined}>{isSaved ? "♥ Dans ma galerie · Retirer" : "Ajouter à ma galerie"}</button>
+            <SubmitButton className={isSaved ? styles.savedButton : undefined} pendingLabel={isSaved ? "Retrait…" : "Ajout…"}>{isSaved ? "♥ Dans ma galerie · Retirer" : "Ajouter à ma galerie"}</SubmitButton>
           </form>
         )}
         <p className={styles.detailDescription}>{activity.description}</p>

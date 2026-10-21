@@ -6,25 +6,17 @@ export async function getActivityTags(
   supabase: Awaited<ReturnType<typeof createClient>>,
   activityId: string,
 ) {
+  // Jointure PostgREST via les cles etrangeres : une requete par liste au lieu de deux.
   const [{ data: objectiveLinks }, { data: equipmentLinks }] = await Promise.all([
-    supabase.from("activity_objectives").select("objective_id").eq("activity_id", activityId),
-    supabase.from("activity_equipment").select("equipment_id").eq("activity_id", activityId),
+    supabase.from("activity_objectives").select("pedagogical_objectives(name)").eq("activity_id", activityId),
+    supabase.from("activity_equipment").select("equipment_items(name)").eq("activity_id", activityId),
   ]);
-
-  const objectiveIds = (objectiveLinks ?? []).map((link) => link.objective_id);
-  const equipmentIds = (equipmentLinks ?? []).map((link) => link.equipment_id);
-  const [{ data: objectives }, { data: equipment }] = await Promise.all([
-    objectiveIds.length
-      ? supabase.from("pedagogical_objectives").select("name").in("id", objectiveIds).order("name")
-      : Promise.resolve({ data: [] as { name: string }[] }),
-    equipmentIds.length
-      ? supabase.from("equipment_items").select("name").in("id", equipmentIds).order("name")
-      : Promise.resolve({ data: [] as { name: string }[] }),
-  ]);
+  const sortedNames = (names: (string | undefined)[]) =>
+    names.filter((name): name is string => Boolean(name)).sort((left, right) => left.localeCompare(right, "fr"));
 
   return {
-    objectives: (objectives ?? []).map((item) => item.name),
-    equipment: (equipment ?? []).map((item) => item.name),
+    objectives: sortedNames((objectiveLinks ?? []).map((link) => link.pedagogical_objectives?.name)),
+    equipment: sortedNames((equipmentLinks ?? []).map((link) => link.equipment_items?.name)),
   };
 }
 
