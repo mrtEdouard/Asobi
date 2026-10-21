@@ -34,6 +34,11 @@
 .cardMeta span { padding: 5px 8px; border-radius: 999px; background: #e9f6f4; color: #087f80; font-size: 9px; font-weight: 800; }
 .activityCard form { margin-top: 13px; }
 .activityCard form button { width: 100%; padding: 9px; border-radius: 999px; background: #08010e; color: #fff; font-size: 11px; font-weight: 800; }
+.cardActions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 13px; }
+.cardActions > a, .cardActions button { display: grid; min-height: 37px; place-items: center; border-radius: 10px; font-size: 10px; font-weight: 820; text-decoration: none; }
+.cardActions > a { background: #08273a; color: #fff; }
+.activityCard .deleteFormCompact { margin: 0; padding: 0; border: 0; }
+.activityCard .deleteFormCompact button { min-height: 37px; padding: 7px; border: 1px solid #d45145; border-radius: 10px; background: #fff; color: #b33c33; }
 .empty { display: grid; justify-items: center; gap: 7px; padding: 40px 20px; border: 1px dashed #d8d3dc; border-radius: 18px; color: #687780; text-align: center; }
 .empty h2 { color: #08273a; font-size: 17px; }
 .empty p { max-width: 245px; font-size: 11px; line-height: 1.5; }
@@ -89,7 +94,7 @@
 .detailNav > a:first-child { color: #687780; font-size: 11px; font-weight: 750; text-decoration: none; }
 .detailNav .editButton { padding: 9px 14px; border-radius: 999px; background: #08010e; color: #fff; font-size: 11px; font-weight: 800; text-decoration: none; }
 .detail { margin-top: 18px; padding-bottom: 18px; }
-.detailHero { position: relative; height: 280px; overflow: hidden; border-radius: 24px; background: #d9e6e3; box-shadow: 0 16px 34px rgba(8,39,58,.16); }
+.detailHero { position: relative; height: 280px; overflow: hidden; border-radius: 10px; background: #d9e6e3; box-shadow: 0 12px 28px rgba(8,39,58,.14); }
 .detailHero > img { object-fit: cover; }
 .heroShade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,39,58,.04) 30%, rgba(8,20,31,.84) 100%); }
 .heroBadges { position: absolute; top: 14px; right: 14px; left: 14px; display: flex; align-items: center; justify-content: space-between; gap: 9px; }
@@ -98,6 +103,8 @@
 .heroTitle { position: absolute; right: 18px; bottom: 18px; left: 18px; color: #fff; }
 .heroTitle h1 { margin: 0; color: inherit; font-size: 28px; text-shadow: 0 2px 12px rgba(0,0,0,.24); }
 .heroTitle p { margin-top: 6px; font-size: 10px; }
+.heroTitle .heroContext { color: #fff; font-size: 11px; font-weight: 800; }
+.heroContext span { margin-inline: 3px; color: #78dfdb; }
 .heroTitle strong { color: #78dfdb; }
 .galleryCount { display: flex; align-items: center; gap: 11px; margin-top: 15px; padding: 12px 14px; border: 1px solid #cfeae7; border-radius: 15px; background: #eff9f8; color: #08273a; }
 .galleryCount > span { display: grid; width: 38px; height: 38px; flex: none; place-items: center; border-radius: 50%; background: #0b9997; color: #fff; font-size: 24px; line-height: 1; }

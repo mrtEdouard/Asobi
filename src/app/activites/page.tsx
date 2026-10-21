@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "../compte/app-shell";
 import { copyActivityAction } from "./actions";
 import { getActivityAuthors, getActivityGalleryCounts } from "./activity-data";
+import { DeleteActivityButton } from "./delete-activity-button";
 import styles from "./activities.module.css";
 
 type SearchParams = Promise<{
@@ -116,7 +117,14 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
                 {activity.visibility === "public" && <span>{galleryCounts.get(activity.source_activity_id ?? activity.id) ?? 0} ajout{(galleryCounts.get(activity.source_activity_id ?? activity.id) ?? 0) > 1 ? "s" : ""}</span>}
               </div>
             </Link>
-            {community && activity.author_id !== user.id && <form action={copyActivityAction}><input type="hidden" name="activityId" value={activity.id} /><button type="submit">Ajouter à ma galerie</button></form>}
+            {activity.author_id === user.id ? (
+              <div className={styles.cardActions}>
+                <Link href={`/activites/${activity.id}/modifier`}>Modifier</Link>
+                <DeleteActivityButton activityId={activity.id} isCopy={Boolean(activity.source_activity_id)} compact />
+              </div>
+            ) : community && (
+              <form action={copyActivityAction}><input type="hidden" name="activityId" value={activity.id} /><button type="submit">Ajouter à ma galerie</button></form>
+            )}
           </article>
         ))}
       </section>

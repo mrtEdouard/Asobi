@@ -52,8 +52,11 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
         <div className={styles.detailHero}>
           <Image src={mainImage} alt={`Illustration de l’activité ${activity.title}`} fill priority sizes="430px" />
           <div className={styles.heroShade} />
-          <div className={styles.heroBadges}><span>{category?.name ?? "Sans catégorie"}</span><b>{activity.visibility === "public" ? "Publique" : "Privée"}</b></div>
-          <div className={styles.heroTitle}><h1>{activity.title}</h1><p>Par <strong>@{authorNames.get(activity.author_id) ?? "membre"}</strong></p></div>
+          <div className={styles.heroTitle}>
+            <h1>{activity.title}</h1>
+            <p className={styles.heroContext}>Activité {category?.name ?? "sans catégorie"} <span>•</span> {activity.visibility === "public" ? "Publique" : "Privée"}</p>
+            <p>Proposée par <strong>@{authorNames.get(activity.author_id) ?? "membre"}</strong></p>
+          </div>
         </div>
         <div className={styles.galleryCount}><span aria-hidden="true">♡</span><div><strong>{galleryCount}</strong><small>{galleryCount > 1 ? "personnes ont" : "personne a"} ajouté cette activité à leur galerie</small></div></div>
         <p className={styles.detailDescription}>{activity.description}</p>
