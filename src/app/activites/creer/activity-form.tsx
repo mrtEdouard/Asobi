@@ -49,6 +49,7 @@ function ErrorMessage({ state, name }: { state: ActivityActionState; name: strin
 
 function InfoTip({ text }: { text: string }) {
   const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState({ left: 12, top: 0, width: 240 });
 
   return (
     <span className={styles.infoTip}>
@@ -56,7 +57,21 @@ function InfoTip({ text }: { text: string }) {
         type="button"
         aria-label="Afficher l’aide"
         aria-expanded={open}
-        onClick={() => setOpen((current) => !current)}
+        onClick={(event) => {
+          if (!open) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const width = Math.min(240, window.innerWidth - 24);
+            const top = rect.bottom + 107 <= window.innerHeight
+              ? rect.bottom + 7
+              : Math.max(12, rect.top - 100);
+            setPosition({
+              left: Math.min(Math.max(rect.left - 8, 12), window.innerWidth - width - 12),
+              top,
+              width,
+            });
+          }
+          setOpen((current) => !current);
+        }}
         onBlur={() => setOpen(false)}
         onKeyDown={(event) => {
           if (event.key === "Escape") setOpen(false);
@@ -64,7 +79,7 @@ function InfoTip({ text }: { text: string }) {
       >
         i
       </button>
-      {open && <span role="status" className={styles.infoPopover}>{text}</span>}
+      {open && <span role="status" className={styles.infoPopover} style={position}>{text}</span>}
     </span>
   );
 }
@@ -191,13 +206,13 @@ export function ActivityForm({ categories }: { categories: Category[] }) {
       <div className={styles.field}><FieldHeading htmlFor="categoryId" help="Obligatoire. Choisis la catégorie qui décrit le mieux l’activité.">Catégorie</FieldHeading><select id="categoryId" name="categoryId" defaultValue="" required><option value="" disabled>Choisir une catégorie</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select><ErrorMessage state={state} name="categoryId" /></div>
 
       <fieldset className={styles.group}><legend><span>Tranche d’âge</span><InfoTip text="Obligatoire. Indique l’âge minimum et maximum du public, entre 0 et 99 ans." /></legend><div className={styles.twoColumns}>
-        <label>Minimum<input name="ageMin" type="number" min="0" max="99" inputMode="numeric" placeholder="6" required /><ErrorMessage state={state} name="ageMin" /></label>
-        <label>Maximum<input name="ageMax" type="number" min="0" max="99" inputMode="numeric" placeholder="10" required /><ErrorMessage state={state} name="ageMax" /></label>
+        <label>Minimum<input name="ageMin" type="number" min="0" max="99" inputMode="numeric" required /><ErrorMessage state={state} name="ageMin" /></label>
+        <label>Maximum<input name="ageMax" type="number" min="0" max="99" inputMode="numeric" required /><ErrorMessage state={state} name="ageMax" /></label>
       </div></fieldset>
 
       <fieldset className={styles.group}><legend><span>Nombre de participants</span><InfoTip text="Obligatoire. Indique l’effectif minimum et maximum conseillé, entre 1 et 999 personnes." /></legend><div className={styles.twoColumns}>
-        <label>Minimum<input name="participantsMin" type="number" min="1" max="999" inputMode="numeric" placeholder="6" required /><ErrorMessage state={state} name="participantsMin" /></label>
-        <label>Maximum<input name="participantsMax" type="number" min="1" max="999" inputMode="numeric" placeholder="16" required /><ErrorMessage state={state} name="participantsMax" /></label>
+        <label>Minimum<input name="participantsMin" type="number" min="1" max="999" inputMode="numeric" required /><ErrorMessage state={state} name="participantsMin" /></label>
+        <label>Maximum<input name="participantsMax" type="number" min="1" max="999" inputMode="numeric" required /><ErrorMessage state={state} name="participantsMax" /></label>
       </div></fieldset>
 
       <div className={styles.twoColumns}>

@@ -84,7 +84,13 @@ export async function createActivityAction(
     p_equipment: activity.equipment,
   });
 
-  if (error) return errorState("L’activité n’a pas pu être enregistrée. Réessaie dans un instant.");
+  if (error) {
+    console.error("Activity creation failed", { code: error.code, message: error.message, details: error.details });
+    if (error.code === "PGRST202") {
+      return errorState("La création d’activité n’est pas encore activée sur la base de données.");
+    }
+    return errorState("L’activité n’a pas pu être enregistrée. Réessaie dans un instant.");
+  }
 
   revalidatePath("/activites");
   redirect("/activites?vue=mes&creation=ok");
