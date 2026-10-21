@@ -80,12 +80,6 @@ begin
     if sqlerrm like 'Le membre B%' then raise; end if;
   end;
 
-  perform public.copy_public_activity(public_id);
-  if (select count(*) from public.activity_images i
-      join public.activities a on a.id = i.activity_id
-      where a.author_id = '93000000-0000-4000-8000-000000000002') <> 2 then
-    raise exception 'Les images ne sont pas reprises dans la copie.';
-  end if;
 end $$;
 
 select set_config('request.jwt.claims',
@@ -96,11 +90,11 @@ declare
   public_id uuid := (select id from public.activities where title = '__images_public__');
   freed integer;
 begin
-  -- La copie de B utilise encore les fichiers : aucun ne doit etre libere.
+  -- Les deux fichiers ne sont plus utilises : ils sont rendus pour suppression du Storage.
   select count(*) into freed from public.delete_activity_images(public_id,
     array(select id from public.activity_images where activity_id = public_id));
-  if freed <> 0 then
-    raise exception 'Des fichiers encore utilises par une copie seraient supprimes.';
+  if freed <> 2 then
+    raise exception 'Les fichiers liberes ne sont pas renvoyes.';
   end if;
 end $$;
 

@@ -6,6 +6,7 @@ import { z } from "zod";
 import { GALLERY_MAX_PHOTOS } from "@/lib/activity-images/rules";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { withNotice } from "./notices";
 import { deleteActivityImages, filesFromFormData, saveActivityImages, validateImage, type ValidImage } from "./activity-images";
 
 export type ActivityActionState = {
@@ -136,10 +137,10 @@ export async function createActivityAction(
 
   revalidatePath("/activites");
   revalidatePath("/compte");
-  if (!imagesSaved) redirect(`/activites/${createdId}?images=erreur`);
+  if (!imagesSaved) redirect(withNotice(`/activites/${createdId}`, "images-erreur"));
   redirect(activity.visibility === "public"
-    ? "/activites?vue=communaute&publication=ok"
-    : "/activites?vue=mes&creation=ok");
+    ? withNotice("/activites?vue=communaute", "activite-publiee")
+    : withNotice("/activites?vue=mes", "activite-creee"));
 }
 
 export async function updateActivityAction(
@@ -205,25 +206,56 @@ export async function updateActivityAction(
   revalidatePath("/activites");
   revalidatePath("/compte");
   revalidatePath(`/activites/${activityId.data}`);
-  if (!imagesSaved) redirect(`/activites/${activityId.data}?images=erreur`);
+  if (!imagesSaved) redirect(withNotice(`/activites/${activityId.data}`, "images-erreur"));
   redirect(activity.visibility === "public"
-    ? "/activites?vue=communaute&modification=ok"
-    : `/activites/${activityId.data}?modification=ok`);
+    ? withNotice("/activites?vue=communaute", "activite-publique")
+    : withNotice(`/activites/${activityId.data}`, "modifications"));
 }
 
-export async function copyActivityAction(formData: FormData) {
+/** Page d'ou vient l'action : on y revient apres l'ajout ou le retrait en galerie. */
+function galleryReturnPath(formData: FormData, activityId: string) {
+  switch (formData.get("returnTo")) {
+    case "fiche": return `/activites/${activityId}`;
+    case "communaute": return "/activites?vue=communaute";
+    default: return "/activites?vue=mes";
+  }
+}
+
+export async function saveActivityAction(formData: FormData) {
   await requireUser();
   const parsed = z.string().uuid().safeParse(formData.get("activityId"));
   if (!parsed.success) return;
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("copy_public_activity", { p_source_id: parsed.data });
-  if (error) return;
+  // La RLS refuse ses propres activites et celles qui ne sont pas publiques.
+  const { error } = await supabase.from("activity_saves").insert({ activity_id: parsed.data });
+  const alreadySaved = error?.code === "23505";
+  if (error && !alreadySaved) {
+    console.error("Activity save failed", { code: error.code, message: error.message });
+    redirect(withNotice(galleryReturnPath(formData, parsed.data), "ajout-galerie-erreur"));
+  }
 
   revalidatePath("/activites");
-  revalidatePath("/compte");
   revalidatePath(`/activites/${parsed.data}`);
-  redirect("/activites?vue=mes&copie=ok");
+  redirect(withNotice(galleryReturnPath(formData, parsed.data), "ajout-galerie"));
+}
+
+export async function unsaveActivityAction(formData: FormData) {
+  const user = await requireUser();
+  const parsed = z.string().uuid().safeParse(formData.get("activityId"));
+  if (!parsed.success) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("activity_saves")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("activity_id", parsed.data);
+  if (error) console.error("Activity unsave failed", { code: error.code, message: error.message });
+
+  revalidatePath("/activites");
+  revalidatePath(`/activites/${parsed.data}`);
+  redirect(withNotice(galleryReturnPath(formData, parsed.data), "retrait-galerie"));
 }
 
 export async function deleteActivityAction(formData: FormData) {
@@ -238,10 +270,10 @@ export async function deleteActivityAction(formData: FormData) {
 
   if (error) {
     console.error("Activity removal failed", { code: error.code, message: error.message });
-    redirect(`/activites/${parsed.data}?suppression=erreur`);
+    redirect(withNotice(`/activites/${parsed.data}`, "suppression-erreur"));
   }
 
   revalidatePath("/activites");
   revalidatePath("/compte");
-  redirect("/activites?vue=mes&suppression=ok");
+  redirect(withNotice("/activites?vue=mes", "suppression"));
 }

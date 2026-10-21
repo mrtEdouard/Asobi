@@ -6,15 +6,17 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "../../compte/app-shell";
+import { saveActivityAction, unsaveActivityAction } from "../actions";
 import { getActivityAuthors, getActivityGalleryCounts, getActivityTags } from "../activity-data";
 import { getActivityImages } from "../activity-images";
 import { DeleteActivityButton } from "../delete-activity-button";
 import { GalleryCount } from "../gallery-count";
+import { NoticeToast } from "../notice-toast";
 import { PhotoGallery } from "../photo-gallery";
 import styles from "../activities.module.css";
 
 type Params = Promise<{ id: string }>;
-type SearchParams = Promise<{ modification?: string; suppression?: string; images?: string }>;
+type SearchParams = Promise<{ notice?: string; n?: string }>;
 
 const environmentNames = { indoor: "Intérieur", outdoor: "Extérieur", both: "Intérieur et extérieur" };
 
@@ -32,18 +34,20 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
   const { data: activity } = await supabase.from("activities").select("*").eq("id", id).is("deleted_at", null).maybeSingle();
   if (!activity) notFound();
 
-  const rootActivityId = activity.source_activity_id ?? activity.id;
-  const [{ data: category }, tags, authorNames, galleryCounts, images] = await Promise.all([
+  const [{ data: category }, tags, authorNames, galleryCounts, images, { data: save }] = await Promise.all([
     activity.category_id
       ? supabase.from("categories").select("name").eq("id", activity.category_id).maybeSingle()
       : Promise.resolve({ data: null }),
     getActivityTags(supabase, id),
     getActivityAuthors(supabase, [id]),
-    getActivityGalleryCounts(supabase, [rootActivityId]),
+    getActivityGalleryCounts(supabase, [id]),
     getActivityImages(supabase, [id]),
+    supabase.from("activity_saves").select("activity_id").eq("user_id", user.id).eq("activity_id", id).maybeSingle(),
   ]);
   const isOwner = activity.author_id === user.id;
-  const galleryCount = galleryCounts.get(rootActivityId) ?? 0;
+  const galleryCount = galleryCounts.get(id) ?? 0;
+  const isSaved = Boolean(save);
+  const backToGallery = activity.visibility !== "public" || isSaved;
   const activityImages = images.get(id);
   // Sans couverture, une illustration par defaut ; les liens signes Supabase ne passent pas par l'optimiseur.
   const coverUrl = activityImages?.cover?.url;
@@ -52,10 +56,8 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
 
   return (
     <AppShell>
-      <div className={styles.detailNav}><Link href={`/activites?vue=${activity.visibility === "public" ? "communaute" : "mes"}`}>← {activity.visibility === "public" ? "Communauté" : "Galerie"}</Link>{isOwner && <Link href={`/activites/${id}/modifier`} className={styles.editButton}>Modifier</Link>}</div>
-      {query.modification === "ok" && <p className={styles.success}>Les modifications ont été enregistrées.</p>}
-      {query.suppression === "erreur" && <p className={styles.errorNotice}>L’activité n’a pas pu être supprimée.</p>}
-      {query.images === "erreur" && <p className={styles.errorNotice}>L’activité est enregistrée, mais certaines photos n’ont pas pu l’être. Réessaie depuis « Modifier ».</p>}
+      <div className={styles.detailNav}><Link href={`/activites?vue=${backToGallery ? "mes" : "communaute"}`}>← {backToGallery ? "Galerie" : "Communauté"}</Link>{isOwner && <Link href={`/activites/${id}/modifier`} className={styles.editButton}>Modifier</Link>}</div>
+      <NoticeToast key={query.n} code={query.notice} />
       <article className={styles.detail}>
         <div className={styles.detailHero}>
           <Image src={coverUrl ?? fallbackImage} alt={`Illustration de l’activité ${activity.title}`} fill priority sizes="430px" unoptimized={Boolean(coverUrl)} />
@@ -67,6 +69,13 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
           </div>
         </div>
         <GalleryCount count={galleryCount} />
+        {!isOwner && activity.visibility === "public" && (
+          <form action={isSaved ? unsaveActivityAction : saveActivityAction} className={styles.saveForm}>
+            <input type="hidden" name="activityId" value={activity.id} />
+            <input type="hidden" name="returnTo" value="fiche" />
+            <button type="submit" className={isSaved ? styles.savedButton : undefined}>{isSaved ? "♥ Dans ma galerie · Retirer" : "Ajouter à ma galerie"}</button>
+          </form>
+        )}
         <p className={styles.detailDescription}>{activity.description}</p>
         <div className={styles.detailMeta}>
           <div><small>Âge</small><strong>{activity.age_min}–{activity.age_max} ans</strong></div>
@@ -85,7 +94,7 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
           </section>
         )}
         {photos.length === 0 && isOwner && <p className={styles.photoHint}><Link href={`/activites/${id}/modifier`}>Ajouter des photos</Link> pour illustrer ta fiche.</p>}
-        {isOwner && <DeleteActivityButton activityId={activity.id} isCopy={Boolean(activity.source_activity_id)} />}
+        {isOwner && <DeleteActivityButton activityId={activity.id} />}
       </article>
     </AppShell>
   );

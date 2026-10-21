@@ -25,7 +25,6 @@ export type Database = {
           safety: string | null;
           visibility: Database["public"]["Enums"]["activity_visibility"];
           status: Database["public"]["Enums"]["activity_status"];
-          source_activity_id: string | null;
           published_at: string | null;
           deleted_at: string | null;
           created_at: string;
@@ -47,7 +46,6 @@ export type Database = {
           safety?: string | null;
           visibility?: Database["public"]["Enums"]["activity_visibility"];
           status?: Database["public"]["Enums"]["activity_status"];
-          source_activity_id?: string | null;
           published_at?: string | null;
           deleted_at?: string | null;
           created_at?: string;
@@ -89,6 +87,12 @@ export type Database = {
           created_at: string;
         };
         Insert: { activity_id: string; storage_path: string; is_cover?: boolean };
+        Update: { [_ in never]: never };
+        Relationships: [];
+      };
+      activity_saves: {
+        Row: { user_id: string; activity_id: string; created_at: string };
+        Insert: { activity_id: string };
         Update: { [_ in never]: never };
         Relationships: [];
       };
@@ -153,7 +157,6 @@ export type Database = {
         };
         Returns: string;
       };
-      copy_public_activity: { Args: { p_source_id: string }; Returns: string };
       delete_activity_images: {
         Args: { p_activity_id: string; p_image_ids: string[] };
         Returns: string[];
