@@ -40,10 +40,14 @@ function readPreview(file: File) {
   });
 }
 
+// Cle d'affichage locale. Pas de crypto.randomUUID() : il n'existe que sur une page HTTPS ou localhost.
+let nextImageKey = 0;
+
 async function prepare(files: File[]): Promise<SelectedImage[]> {
   return Promise.all(files.map(async (original) => {
     const file = await compressImage(original);
-    return { key: crypto.randomUUID(), file, preview: await readPreview(file) };
+    nextImageKey += 1;
+    return { key: `image-${nextImageKey}`, file, preview: await readPreview(file) };
   }));
 }
 

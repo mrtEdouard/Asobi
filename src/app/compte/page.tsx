@@ -5,6 +5,7 @@ import animixLogo from "../../../logo-animix.png";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { getActivityAuthors } from "../activites/activity-data";
+import { getActivityImages } from "../activites/activity-images";
 import { BottomNavigation } from "./bottom-navigation";
 import styles from "./home.module.css";
 
@@ -34,7 +35,11 @@ async function Home() {
   ]);
 
   const username = profile?.username ?? String(user.user_metadata.username ?? "");
-  const authorNames = await getActivityAuthors(supabase, (recentActivities ?? []).map((activity) => activity.id));
+  const recentIds = (recentActivities ?? []).map((activity) => activity.id);
+  const [authorNames, images] = await Promise.all([
+    getActivityAuthors(supabase, recentIds),
+    getActivityImages(supabase, recentIds),
+  ]);
   const categoryNames = new Map((categories ?? []).map((category) => [category.id, category.name]));
   const activityImages = ["/images/cards/activite-fresque.webp", "/images/cards/activite-explorateurs.webp"];
   const environmentNames = { indoor: "Intérieur", outdoor: "Extérieur", both: "Intérieur/extérieur" };
@@ -60,7 +65,9 @@ async function Home() {
               {!recentActivities?.length ? <p className={styles.carouselEmpty}>Les prochaines activités partagées apparaîtront ici.</p> : recentActivities.map((activity, index) => (
                 <Link href={`/activites/${activity.id}`} className={styles.activityCard} key={activity.id}>
                   <div className={styles.activityVisual}>
-                    <Image className={styles.cardImage} src={activityImages[index % activityImages.length]} alt="" fill sizes="180px" />
+                    {images.get(activity.id)?.cover
+                      ? <Image className={styles.cardImage} src={images.get(activity.id)!.cover!.url} alt="" fill unoptimized sizes="180px" />
+                      : <Image className={styles.cardImage} src={activityImages[index % activityImages.length]} alt="" fill sizes="180px" />}
                     {activity.age_min != null && activity.age_max != null && <span className={styles.activityBadge}>{activity.age_min}–{activity.age_max} ans</span>}
                   </div>
                   <div className={styles.cardBody}>

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy": "git push && ssh root@159.195.247.184 'bash /var/www/asobi/current/scripts/deploy.sh'"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
