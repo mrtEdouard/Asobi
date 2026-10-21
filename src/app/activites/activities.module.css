@@ -59,7 +59,7 @@
 .visibility legend { grid-column: 1 / -1; }
 .visibility label { position: relative; cursor: pointer; }
 .visibility input { position: absolute; opacity: 0; }
-.visibility span { display: grid; min-height: 70px; align-content: center; gap: 3px; padding: 10px; border: 1px solid #d5d2d8; border-radius: 13px; background: #fff; color: #08273a; }
+.visibility label > span { display: grid; min-height: 70px; align-content: center; gap: 3px; padding: 10px; border: 1px solid #d5d2d8; border-radius: 13px; background: #fff; color: #08273a; }
 .visibility strong { font-size: 12px; }
 .visibility small { color: #748087; font-size: 9px; line-height: 1.35; }
 .visibility input:checked + span { border-color: #08010e; background: #08010e; color: #fff; }
