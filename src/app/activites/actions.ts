@@ -12,10 +12,7 @@ export type ActivityActionState = {
   errors?: Record<string, string[]>;
 };
 
-const tags = z.preprocess(
-  (value) => String(value ?? "").split(",").map((item) => item.trim()).filter(Boolean),
-  z.array(z.string().min(1).max(100)).max(20, "Limite-toi à 20 mots-clés."),
-);
+const tags = z.array(z.string().trim().min(1).max(100)).max(20, "Limite-toi à 20 mots-clés.");
 
 const activitySchema = z.object({
   title: z.string().trim().min(3, "Le titre doit contenir au moins 3 caractères.").max(180),
@@ -57,8 +54,8 @@ export async function createActivityAction(
     participantsMax: formData.get("participantsMax"),
     durationMinutes: formData.get("durationMinutes"),
     environment: formData.get("environment"),
-    objectives: formData.get("objectives"),
-    equipment: formData.get("equipment"),
+    objectives: formData.getAll("objectives"),
+    equipment: formData.getAll("equipment"),
     preparation: formData.get("preparation"),
     safety: formData.get("safety"),
     visibility: formData.get("visibility"),

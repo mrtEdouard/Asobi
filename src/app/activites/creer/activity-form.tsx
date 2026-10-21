@@ -8,9 +8,73 @@ import styles from "../activities.module.css";
 type Category = { id: string; name: string };
 const initialState: ActivityActionState = { status: "idle" };
 
+const pedagogicalObjectives = [
+  "Coopération",
+  "Autonomie",
+  "Créativité",
+  "Communication",
+  "Motricité",
+  "Confiance en soi",
+  "Expression",
+  "Concentration",
+  "Découverte",
+  "Respect",
+  "Imagination",
+  "Esprit d’équipe",
+];
+
+const equipmentItems = [
+  "Sans matériel",
+  "Ballon",
+  "Corde",
+  "Plots",
+  "Cercles",
+  "Feuilles",
+  "Carton",
+  "Crayons",
+  "Feutres",
+  "Peinture",
+  "Ciseaux",
+  "Colle",
+  "Musique",
+  "Dés",
+  "Cartes",
+  "Chronomètre",
+];
+
 function ErrorMessage({ state, name }: { state: ActivityActionState; name: string }) {
   const message = state.errors?.[name]?.[0];
   return message ? <p className={styles.fieldError}>{message}</p> : null;
+}
+
+function BubblePicker({
+  legend,
+  hint,
+  name,
+  options,
+  state,
+}: {
+  legend: string;
+  hint: string;
+  name: "objectives" | "equipment";
+  options: string[];
+  state: ActivityActionState;
+}) {
+  return (
+    <fieldset className={styles.bubblePicker}>
+      <legend>{legend}</legend>
+      <p>{hint}</p>
+      <div className={styles.bubbleCloud}>
+        {options.map((option) => (
+          <label key={option} className={styles.bubbleChoice}>
+            <input type="checkbox" name={name} value={option} />
+            <span>{option}</span>
+          </label>
+        ))}
+      </div>
+      <ErrorMessage state={state} name={name} />
+    </fieldset>
+  );
 }
 
 export function ActivityForm({ categories }: { categories: Category[] }) {
@@ -37,8 +101,20 @@ export function ActivityForm({ categories }: { categories: Category[] }) {
         <label className={styles.field}>Environnement<select name="environment" defaultValue="both"><option value="indoor">Intérieur</option><option value="outdoor">Extérieur</option><option value="both">Les deux</option></select></label>
       </div>
 
-      <label className={styles.field}>Objectifs pédagogiques<input name="objectives" placeholder="Coopération, créativité, autonomie…" /><small>Sépare les mots-clés par des virgules.</small><ErrorMessage state={state} name="objectives" /></label>
-      <label className={styles.field}>Matériel<input name="equipment" placeholder="Ballons, feuilles, feutres…" /><small>Sépare les éléments par des virgules.</small><ErrorMessage state={state} name="equipment" /></label>
+      <BubblePicker
+        legend="Objectifs pédagogiques"
+        hint="Touche les objectifs travaillés par l’activité."
+        name="objectives"
+        options={pedagogicalObjectives}
+        state={state}
+      />
+      <BubblePicker
+        legend="Matériel"
+        hint="Sélectionne tout ce qu’il faut prévoir."
+        name="equipment"
+        options={equipmentItems}
+        state={state}
+      />
       <label className={styles.field}>Préparation et déroulement<textarea name="preparation" rows={8} maxLength={5000} required /><ErrorMessage state={state} name="preparation" /></label>
       <label className={styles.field}>Sécurité et points de vigilance<textarea name="safety" rows={4} maxLength={3000} required /><ErrorMessage state={state} name="safety" /></label>
 
