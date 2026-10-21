@@ -1,26 +1,16 @@
 import Image from "next/image";
-import { Suspense, type ReactNode } from "react";
+import Link from "next/link";
+import { Suspense } from "react";
 import animixLogo from "../../../logo-animix.png";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { CreateMenu } from "./create-menu";
+import { BottomNavigation } from "./bottom-navigation";
 import styles from "./home.module.css";
 
-type IconName = "home" | "activities" | "offers" | "profile" | "plus" | "arrow";
-
-function Icon({ name }: { name: IconName }) {
-  const paths: Record<IconName, ReactNode> = {
-    home: <><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></>,
-    activities: <><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></>,
-    offers: <><path d="M4 7h16v13H4z"/><path d="M9 7V4h6v3M4 12h16M10 12v2h4v-2"/></>,
-    profile: <><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></>,
-    plus: <path d="M12 5v14M5 12h14"/>,
-    arrow: <path d="m9 18 6-6-6-6"/>,
-  };
-
+function ArrowIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-      {paths[name]}
+      <path d="m9 18 6-6-6-6" />
     </svg>
   );
 }
@@ -59,7 +49,7 @@ async function Home() {
           <section className={styles.section} aria-labelledby="activities-title">
             <div className={styles.sectionHeading}>
               <h2 id="activities-title">Dernières activités partagées</h2>
-              <button type="button" className={styles.seeAll}>Tout voir <Icon name="arrow" /></button>
+              <Link href="/activites" className={styles.seeAll}>Tout voir <ArrowIcon /></Link>
             </div>
             <div className={styles.carousel} aria-label="Activités récentes">
               <article className={styles.activityCard}>
@@ -92,7 +82,7 @@ async function Home() {
           <section className={styles.section} aria-labelledby="offers-title">
             <div className={styles.sectionHeading}>
               <h2 id="offers-title">Dernières offres</h2>
-              <button type="button" className={styles.seeAll}>Tout voir <Icon name="arrow" /></button>
+              <Link href="/offres" className={styles.seeAll}>Tout voir <ArrowIcon /></Link>
             </div>
             <div className={styles.carousel} aria-label="Offres récentes">
               <article className={styles.offerCard}>
@@ -105,7 +95,7 @@ async function Home() {
                   <p>Annecy · du 8 au 21 juillet</p>
                   <div className={styles.tags}><span>BAFA</span><span>Débutants acceptés</span></div>
                 </div>
-                <span className={styles.offerArrow}><Icon name="arrow" /></span>
+                <span className={styles.offerArrow}><ArrowIcon /></span>
               </article>
               <article className={styles.offerCard}>
                 <div className={styles.offerVisual}>
@@ -117,19 +107,13 @@ async function Home() {
                   <p>Lyon · du 5 au 30 août</p>
                   <div className={styles.tags}><span>BAFA</span><span>Sans hébergement</span></div>
                 </div>
-                <span className={styles.offerArrow}><Icon name="arrow" /></span>
+                <span className={styles.offerArrow}><ArrowIcon /></span>
               </article>
             </div>
           </section>
         </div>
 
-        <nav className={styles.bottomNav} aria-label="Navigation principale">
-          <button className={`${styles.navItem} ${styles.active}`} type="button" aria-current="page"><Icon name="home" /><span>Accueil</span></button>
-          <button className={styles.navItem} type="button"><Icon name="activities" /><span>Activités</span></button>
-          <CreateMenu />
-          <button className={styles.navItem} type="button"><Icon name="offers" /><span>Offres</span></button>
-          <button className={styles.navItem} type="button"><Icon name="profile" /><span>Profil</span></button>
-        </nav>
+        <BottomNavigation />
       </div>
     </main>
   );

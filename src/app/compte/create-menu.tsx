@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import styles from "./home.module.css";
 
@@ -38,8 +39,8 @@ export function CreateMenu() {
     <div ref={controlRef} className={styles.createControl}>
       {open && (
         <div id="create-menu" className={styles.createMenu} role="menu" aria-label="Créer un contenu">
-          <button type="button" role="menuitem" onClick={() => setOpen(false)}>Une activité</button>
-          <button type="button" role="menuitem" onClick={() => setOpen(false)}>Une offre</button>
+          <Link href="/activites/creer" role="menuitem" onClick={() => setOpen(false)}>Une activité</Link>
+          <Link href="/offres/creer" role="menuitem" onClick={() => setOpen(false)}>Une offre</Link>
         </div>
       )}
       <button
