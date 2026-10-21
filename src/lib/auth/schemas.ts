@@ -35,12 +35,17 @@ const birthDate = z
     return new Date(`${value}T00:00:00.000Z`) <= minimum;
   }, "Il faut avoir au moins 16 ans pour créer un compte.");
 
+const accountType = z.enum(["animateur", "directeur"], {
+  error: "Choisis le type de compte qui te correspond.",
+});
+
 export const loginSchema = z.object({ email, password: z.string().min(1, "Le mot de passe est obligatoire.") });
 
 export const signupSchema = z
   .object({
     username,
     birthDate,
+    accountType,
     email,
     password,
     passwordConfirmation: z.string(),

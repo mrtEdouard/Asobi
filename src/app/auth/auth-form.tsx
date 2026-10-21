@@ -156,6 +156,22 @@ export function SignupForm() {
           <FieldError state={state} name="birthDate" />
           </div>
           <div className={styles.field}>
+            <fieldset className={styles.accountTypeField} aria-invalid={Boolean(state.errors?.accountType)} aria-describedby={state.errors?.accountType ? "accountType-error" : undefined}>
+              <legend>Tu es plutôt…</legend>
+              <div className={styles.accountTypeOptions}>
+                <label className={styles.accountTypeOption}>
+                  <input type="radio" name="accountType" value="animateur" defaultChecked />
+                  <span><strong>Animateur</strong><small>Je cherche et je partage des activités</small></span>
+                </label>
+                <label className={styles.accountTypeOption}>
+                  <input type="radio" name="accountType" value="directeur" />
+                  <span><strong>Directeur</strong><small>Je recrute et je prépare mes séjours</small></span>
+                </label>
+              </div>
+            </fieldset>
+            <FieldError state={state} name="accountType" />
+          </div>
+          <div className={styles.field}>
           <label htmlFor="email">E-mail</label>
           <input id="email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="prenom@exemple.fr" aria-invalid={Boolean(state.errors?.email)} aria-describedby={state.errors?.email ? "email-error" : undefined} required />
           <FieldError state={state} name="email" />

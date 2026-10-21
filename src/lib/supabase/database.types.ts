@@ -13,6 +13,7 @@ export type Database = {
           id: string;
           username: string;
           birth_date: string;
+          account_type: Database["public"]["Enums"]["profile_account_type"];
           first_name: string | null;
           last_name: string | null;
           avatar_key: string | null;
@@ -25,6 +26,7 @@ export type Database = {
           id: string;
           username: string;
           birth_date: string;
+          account_type?: Database["public"]["Enums"]["profile_account_type"];
           first_name?: string | null;
           last_name?: string | null;
           avatar_key?: string | null;
@@ -35,6 +37,7 @@ export type Database = {
         };
         Update: {
           username?: string;
+          account_type?: Database["public"]["Enums"]["profile_account_type"];
           first_name?: string | null;
           last_name?: string | null;
           avatar_key?: string | null;
@@ -47,7 +50,7 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
-    Enums: { [_ in never]: never };
+    Enums: { profile_account_type: "animateur" | "directeur" };
     CompositeTypes: { [_ in never]: never };
   };
 };

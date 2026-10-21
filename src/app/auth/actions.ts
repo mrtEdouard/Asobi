@@ -55,6 +55,7 @@ export async function signupAction(
   const parsed = signupSchema.safeParse({
     username: formData.get("username"),
     birthDate: formData.get("birthDate"),
+    accountType: formData.get("accountType"),
     email: formData.get("email"),
     password: formData.get("password"),
     passwordConfirmation: formData.get("passwordConfirmation"),
@@ -75,6 +76,7 @@ export async function signupAction(
       data: {
         username: parsed.data.username,
         birth_date: parsed.data.birthDate,
+        account_type: parsed.data.accountType,
       },
     },
   });

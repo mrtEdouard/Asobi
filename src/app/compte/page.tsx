@@ -3,6 +3,7 @@ import { Suspense, type ReactNode } from "react";
 import animixLogo from "../../../logo-animix.png";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { CreateMenu } from "./create-menu";
 import styles from "./home.module.css";
 
 type IconName = "home" | "activities" | "offers" | "profile" | "plus" | "arrow";
@@ -125,7 +126,7 @@ async function Home() {
         <nav className={styles.bottomNav} aria-label="Navigation principale">
           <button className={`${styles.navItem} ${styles.active}`} type="button" aria-current="page"><Icon name="home" /><span>Accueil</span></button>
           <button className={styles.navItem} type="button"><Icon name="activities" /><span>Activités</span></button>
-          <button className={styles.createButton} type="button" aria-label="Créer"><Icon name="plus" /></button>
+          <CreateMenu />
           <button className={styles.navItem} type="button"><Icon name="offers" /><span>Offres</span></button>
           <button className={styles.navItem} type="button"><Icon name="profile" /><span>Profil</span></button>
         </nav>
