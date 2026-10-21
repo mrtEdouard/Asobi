@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "../../compte/app-shell";
 import { getActivityAuthors, getActivityGalleryCounts, getActivityTags } from "../activity-data";
 import { DeleteActivityButton } from "../delete-activity-button";
+import { GalleryCount } from "../gallery-count";
 import styles from "../activities.module.css";
 
 type Params = Promise<{ id: string }>;
@@ -58,7 +59,7 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
             <p>Proposée par <strong>@{authorNames.get(activity.author_id) ?? "membre"}</strong></p>
           </div>
         </div>
-        <div className={styles.galleryCount}><span aria-hidden="true">♡</span><div><strong>{galleryCount}</strong><small>{galleryCount > 1 ? "personnes ont" : "personne a"} ajouté cette activité à leur galerie</small></div></div>
+        <GalleryCount count={galleryCount} />
         <p className={styles.detailDescription}>{activity.description}</p>
         <div className={styles.detailMeta}>
           <div><small>Âge</small><strong>{activity.age_min}–{activity.age_max} ans</strong></div>

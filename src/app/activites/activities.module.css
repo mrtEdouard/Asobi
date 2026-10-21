@@ -100,17 +100,18 @@
 .heroBadges { position: absolute; top: 14px; right: 14px; left: 14px; display: flex; align-items: center; justify-content: space-between; gap: 9px; }
 .heroBadges span, .heroBadges b { padding: 6px 9px; border-radius: 999px; background: rgba(255,255,255,.92); color: #087f80; font-size: 8px; font-weight: 850; text-transform: uppercase; backdrop-filter: blur(7px); }
 .heroBadges b { color: #625968; }
-.heroTitle { position: absolute; right: 18px; bottom: 18px; left: 18px; color: #fff; }
+.heroTitle { position: absolute; right: 12px; bottom: 12px; left: 12px; padding: 13px 14px; border: 1px solid rgba(255,255,255,.16); border-radius: 8px; background: rgba(5,20,30,.68); box-shadow: 0 8px 24px rgba(0,0,0,.2); color: #fff; backdrop-filter: blur(8px); }
 .heroTitle h1 { margin: 0; color: inherit; font-size: 28px; text-shadow: 0 2px 12px rgba(0,0,0,.24); }
 .heroTitle p { margin-top: 6px; font-size: 10px; }
 .heroTitle .heroContext { color: #fff; font-size: 11px; font-weight: 800; }
 .heroContext span { margin-inline: 3px; color: #78dfdb; }
 .heroTitle strong { color: #78dfdb; }
-.galleryCount { display: flex; align-items: center; gap: 11px; margin-top: 15px; padding: 12px 14px; border: 1px solid #cfeae7; border-radius: 15px; background: #eff9f8; color: #08273a; }
-.galleryCount > span { display: grid; width: 38px; height: 38px; flex: none; place-items: center; border-radius: 50%; background: #0b9997; color: #fff; font-size: 24px; line-height: 1; }
-.galleryCount div { display: flex; min-width: 0; align-items: baseline; gap: 6px; }
-.galleryCount strong { color: #087f80; font-size: 19px; }
-.galleryCount small { color: #536a75; font-size: 9px; line-height: 1.35; }
+.galleryCount { position: relative; display: flex; width: fit-content; align-items: center; gap: 5px; margin-top: 13px; color: #536a75; }
+.galleryHeart { color: #0b9997; font-size: 21px; line-height: 1; }
+.galleryCount > strong { color: #08273a; font-size: 12px; }
+.countInfo { position: relative; display: inline-flex; margin-left: 2px; }
+.countInfo > button { display: grid; width: 17px; height: 17px; padding: 0; place-items: center; border: 1px solid #9cb5b7; border-radius: 50%; background: transparent; color: #60787e; font-family: Georgia,serif; font-size: 10px; font-weight: 800; line-height: 1; }
+.countInfo > span { position: absolute; z-index: 5; top: 25px; left: -52px; width: min(245px,calc(100vw - 56px)); padding: 9px 10px; border-radius: 9px; background: #08273a; box-shadow: 0 8px 20px rgba(8,39,58,.2); color: #fff; font-size: 9px; line-height: 1.45; }
 .detail h1 { margin-top: 11px; color: #08273a; font-size: 29px; font-weight: 880; letter-spacing: -.045em; line-height: 1.08; }
 .detailDescription { margin-top: 9px; color: #687780; font-size: 12px; line-height: 1.55; }
 .detailAuthor { margin-top: 7px; color: #687780; font-size: 10px; }
