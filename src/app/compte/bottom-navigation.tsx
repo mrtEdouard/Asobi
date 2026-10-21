@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { CreateMenu } from "./create-menu";
+import { ProfileMenu, profileMenuPaths } from "./profile-menu";
 import styles from "./home.module.css";
 
 type IconName = "home" | "activities" | "offers" | "profile";
@@ -35,7 +36,6 @@ export function BottomNavigation() {
     { href: "/compte", label: "Accueil", icon: "home" },
     { href: "/activites", label: "Activités", icon: "activities" },
     { href: "/offres", label: "Offres", icon: "offers" },
-    { href: "/profil", label: "Profil", icon: "profile" },
   ];
 
   return (
@@ -49,6 +49,7 @@ export function BottomNavigation() {
         const active = isActive(pathname, link.href);
         return <Link key={link.href} href={link.href} className={`${styles.navItem} ${active ? styles.active : ""}`} aria-current={active ? "page" : undefined}><Icon name={link.icon} /><span>{link.label}</span></Link>;
       })}
+      <ProfileMenu active={profileMenuPaths.some((href) => isActive(pathname, href))} icon={<Icon name="profile" />} />
     </nav>
   );
 }
