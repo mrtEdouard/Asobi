@@ -41,7 +41,7 @@ async function Home() {
     .eq("id", user.id)
     .single();
 
-  const username = profile?.username ?? "membre";
+  const username = profile?.username ?? user.user_metadata?.username ?? "";
 
   return (
     <main className={styles.viewport}>
@@ -52,14 +52,12 @@ async function Home() {
           </header>
 
           <section className={styles.welcome}>
-            <p>Bonjour,</p>
-            <h1>{username} <span aria-hidden="true">👋</span></h1>
-            <p className={styles.intro}>Qu’est-ce qu’on prépare aujourd’hui&nbsp;?</p>
+            <h1>Bonjour{username ? `, ${username}` : ""} <span aria-hidden="true">👋</span></h1>
           </section>
 
           <section className={styles.section} aria-labelledby="activities-title">
             <div className={styles.sectionHeading}>
-              <div><p className={styles.eyebrow}>À découvrir</p><h2 id="activities-title">Dernières activités partagées</h2></div>
+              <h2 id="activities-title">Dernières activités partagées</h2>
               <button type="button" className={styles.seeAll}>Tout voir <Icon name="arrow" /></button>
             </div>
             <div className={styles.carousel} aria-label="Activités récentes">
@@ -92,7 +90,7 @@ async function Home() {
 
           <section className={styles.section} aria-labelledby="offers-title">
             <div className={styles.sectionHeading}>
-              <div><p className={styles.eyebrow}>Près de toi</p><h2 id="offers-title">Dernières offres</h2></div>
+              <h2 id="offers-title">Dernières offres</h2>
               <button type="button" className={styles.seeAll}>Tout voir <Icon name="arrow" /></button>
             </div>
             <div className={styles.carousel} aria-label="Offres récentes">
