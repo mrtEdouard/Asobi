@@ -7,12 +7,26 @@
 .tabs a { padding: 9px 7px; border-radius: 10px; color: #746e78; font-size: 12px; font-weight: 800; text-align: center; text-decoration: none; }
 .tabs .activeTab { background: #08010e; box-shadow: 0 5px 13px rgba(8,1,14,.18); color: #fff; }
 .success { margin-top: 14px; padding: 10px 12px; border-radius: 11px; background: #e9f6f4; color: #087f80; font-size: 11px; font-weight: 750; }
+.filters { display: grid; gap: 9px; margin-top: 16px; padding: 12px; border: 1px solid #e1dfe3; border-radius: 16px; background: #f8f7f8; }
+.searchField { display: grid; grid-template-columns: 1fr 42px; overflow: hidden; border: 1px solid #d5d2d8; border-radius: 12px; background: #fff; }
+.searchField input { width: 100%; min-width: 0; border: 0; padding: 11px 12px; background: transparent; color: #08273a; font-size: 12px; outline: none; }
+.searchField:focus-within { border-color: #0b9997; box-shadow: 0 0 0 3px rgba(11,153,151,.12); }
+.searchField button { background: #08273a; color: #fff; font-size: 20px; }
+.filterGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.filterGrid label { display: grid; gap: 4px; color: #687780; font-size: 8px; font-weight: 800; text-transform: uppercase; }
+.filterGrid select { width: 100%; min-width: 0; border: 1px solid #d5d2d8; border-radius: 10px; background: #fff; padding: 9px 8px; color: #08273a; font-size: 10px; outline: none; }
+.filterGrid button { align-self: end; min-height: 36px; border-radius: 10px; background: #08010e; color: #fff; font-size: 10px; font-weight: 800; }
+.resetFilters { justify-self: center; color: #087f80; font-size: 9px; font-weight: 750; }
+.resultCount { margin-top: 12px; color: #748087; font-size: 9px; font-weight: 750; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 .list { display: grid; gap: 12px; margin-top: 17px; }
 .activityCard { padding: 16px; border: 1px solid #dedde0; border-radius: 17px; background: #fff; box-shadow: 0 8px 22px rgba(8,39,58,.07); }
+.cardLink { display: block; color: inherit; text-decoration: none; }
+.cardLink:focus-visible { border-radius: 10px; outline: 3px solid rgba(11,153,151,.2); outline-offset: 4px; }
 .cardTopline { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #0b8585; font-size: 9px; font-weight: 800; text-transform: uppercase; }
 .cardTopline b { padding: 4px 7px; border-radius: 999px; background: #f0edf2; color: #706777; font-size: 8px; }
 .activityCard h2 { margin-top: 9px; color: #08273a; font-size: 17px; font-weight: 850; letter-spacing: -.025em; }
-.activityCard > p { display: -webkit-box; margin-top: 5px; overflow: hidden; color: #687780; font-size: 11px; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.cardLink > p { display: -webkit-box; margin-top: 5px; overflow: hidden; color: #687780; font-size: 11px; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .cardMeta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; }
 .cardMeta span { padding: 5px 8px; border-radius: 999px; background: #e9f6f4; color: #087f80; font-size: 9px; font-weight: 800; }
 .activityCard form { margin-top: 13px; }
@@ -68,3 +82,18 @@
 .formActions a { background: transparent; color: #08010e; }
 .formActions button { background: #08010e; color: #fff; }
 .formActions button:disabled { opacity: .55; }
+.detailNav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; }
+.detailNav > a:first-child { color: #687780; font-size: 11px; font-weight: 750; text-decoration: none; }
+.detailNav .editButton { padding: 9px 14px; border-radius: 999px; background: #08010e; color: #fff; font-size: 11px; font-weight: 800; text-decoration: none; }
+.detail { margin-top: 18px; }
+.detail h1 { margin-top: 11px; color: #08273a; font-size: 29px; font-weight: 880; letter-spacing: -.045em; line-height: 1.08; }
+.detailDescription { margin-top: 9px; color: #687780; font-size: 12px; line-height: 1.55; }
+.detailMeta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
+.detailMeta div { display: grid; gap: 3px; padding: 11px; border-radius: 12px; background: #f3f5f5; }
+.detailMeta small { color: #718087; font-size: 8px; font-weight: 800; text-transform: uppercase; }
+.detailMeta strong { color: #08273a; font-size: 11px; }
+.detailSection { margin-top: 20px; }
+.detailSection h2 { margin-bottom: 8px; color: #08273a; font-size: 14px; font-weight: 850; }
+.detailSection > p, .detailTags p { color: #536a75; font-size: 11px; line-height: 1.65; white-space: pre-wrap; }
+.detailTags { display: flex; flex-wrap: wrap; gap: 7px; }
+.detailTags span { padding: 7px 10px; border-radius: 999px; background: #e9f6f4; color: #087f80; font-size: 9px; font-weight: 800; }

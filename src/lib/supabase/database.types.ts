@@ -142,6 +142,26 @@ export type Database = {
         Returns: string;
       };
       copy_public_activity: { Args: { p_source_id: string }; Returns: string };
+      update_activity_with_tags: {
+        Args: {
+          p_activity_id: string;
+          p_category_id: string;
+          p_title: string;
+          p_description: string;
+          p_age_min: number;
+          p_age_max: number;
+          p_participants_min: number;
+          p_participants_max: number;
+          p_duration_minutes: number;
+          p_environment: Database["public"]["Enums"]["activity_environment"];
+          p_preparation: string;
+          p_safety: string;
+          p_visibility: Database["public"]["Enums"]["activity_visibility"];
+          p_objectives: string[];
+          p_equipment: string[];
+        };
+        Returns: string;
+      };
     };
     Enums: {
       profile_account_type: "animateur" | "directeur";

@@ -2,10 +2,27 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { createActivityAction, type ActivityActionState } from "../actions";
+import { createActivityAction, updateActivityAction, type ActivityActionState } from "../actions";
 import styles from "../activities.module.css";
 
 type Category = { id: string; name: string };
+export type ActivityFormValues = {
+  id: string;
+  title: string;
+  description: string;
+  categoryId: string;
+  ageMin: number;
+  ageMax: number;
+  participantsMin: number;
+  participantsMax: number;
+  durationMinutes: number;
+  environment: "indoor" | "outdoor" | "both";
+  objectives: string[];
+  equipment: string[];
+  preparation: string;
+  safety: string;
+  visibility: "private" | "public";
+};
 const initialState: ActivityActionState = { status: "idle" };
 
 const pedagogicalObjectives = [
@@ -98,16 +115,20 @@ function BubblePicker({
   hint,
   name,
   options,
+  initialSelected = [],
   state,
 }: {
   legend: string;
   hint: string;
   name: "objectives" | "equipment";
   options: string[];
+  initialSelected?: string[];
   state: ActivityActionState;
 }) {
-  const [selected, setSelected] = useState<string[]>([]);
-  const [customOptions, setCustomOptions] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>(initialSelected);
+  const [customOptions, setCustomOptions] = useState<string[]>(
+    initialSelected.filter((value) => !options.some((option) => option.localeCompare(value, "fr", { sensitivity: "base" }) === 0)),
+  );
   const [customValue, setCustomValue] = useState("");
   const [customError, setCustomError] = useState<string>();
   const allOptions = [...options, ...customOptions];
@@ -196,28 +217,29 @@ function BubblePicker({
   );
 }
 
-export function ActivityForm({ categories }: { categories: Category[] }) {
-  const [state, action, pending] = useActionState(createActivityAction, initialState);
+export function ActivityForm({ categories, activity }: { categories: Category[]; activity?: ActivityFormValues }) {
+  const [state, action, pending] = useActionState(activity ? updateActivityAction : createActivityAction, initialState);
 
   return (
     <form action={action} className={styles.form} aria-busy={pending} noValidate>
-      <div className={styles.field}><FieldHeading htmlFor="title" help="Obligatoire. Entre 3 et 180 caractères.">Titre</FieldHeading><input id="title" name="title" maxLength={180} placeholder="Ex. La fresque des émotions" required /><ErrorMessage state={state} name="title" /></div>
-      <div className={styles.field}><FieldHeading htmlFor="description" help="Obligatoire. Résume le principe de l’activité en 10 à 1 500 caractères.">Description</FieldHeading><textarea id="description" name="description" rows={4} maxLength={1500} placeholder="Résume le principe de l’activité et ce que les participants vont faire." required /><ErrorMessage state={state} name="description" /></div>
-      <div className={styles.field}><FieldHeading htmlFor="categoryId" help="Obligatoire. Choisis la catégorie qui décrit le mieux l’activité.">Catégorie</FieldHeading><select id="categoryId" name="categoryId" defaultValue="" required><option value="" disabled>Choisir une catégorie</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select><ErrorMessage state={state} name="categoryId" /></div>
+      {activity && <input type="hidden" name="activityId" value={activity.id} />}
+      <div className={styles.field}><FieldHeading htmlFor="title" help="Obligatoire. Entre 3 et 180 caractères.">Titre</FieldHeading><input id="title" name="title" maxLength={180} placeholder="Ex. La fresque des émotions" defaultValue={activity?.title} required /><ErrorMessage state={state} name="title" /></div>
+      <div className={styles.field}><FieldHeading htmlFor="description" help="Obligatoire. Résume le principe de l’activité en 10 à 1 500 caractères.">Description</FieldHeading><textarea id="description" name="description" rows={4} maxLength={1500} placeholder="Résume le principe de l’activité et ce que les participants vont faire." defaultValue={activity?.description} required /><ErrorMessage state={state} name="description" /></div>
+      <div className={styles.field}><FieldHeading htmlFor="categoryId" help="Obligatoire. Choisis la catégorie qui décrit le mieux l’activité.">Catégorie</FieldHeading><select id="categoryId" name="categoryId" defaultValue={activity?.categoryId ?? ""} required><option value="" disabled>Choisir une catégorie</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select><ErrorMessage state={state} name="categoryId" /></div>
 
       <fieldset className={styles.group}><legend><span>Tranche d’âge</span><InfoTip text="Obligatoire. Indique l’âge minimum et maximum du public, entre 0 et 99 ans." /></legend><div className={styles.twoColumns}>
-        <label>Minimum<input name="ageMin" type="number" min="0" max="99" inputMode="numeric" required /><ErrorMessage state={state} name="ageMin" /></label>
-        <label>Maximum<input name="ageMax" type="number" min="0" max="99" inputMode="numeric" required /><ErrorMessage state={state} name="ageMax" /></label>
+        <label>Minimum<input name="ageMin" type="number" min="0" max="99" inputMode="numeric" defaultValue={activity?.ageMin} required /><ErrorMessage state={state} name="ageMin" /></label>
+        <label>Maximum<input name="ageMax" type="number" min="0" max="99" inputMode="numeric" defaultValue={activity?.ageMax} required /><ErrorMessage state={state} name="ageMax" /></label>
       </div></fieldset>
 
       <fieldset className={styles.group}><legend><span>Nombre de participants</span><InfoTip text="Obligatoire. Indique l’effectif minimum et maximum conseillé, entre 1 et 999 personnes." /></legend><div className={styles.twoColumns}>
-        <label>Minimum<input name="participantsMin" type="number" min="1" max="999" inputMode="numeric" required /><ErrorMessage state={state} name="participantsMin" /></label>
-        <label>Maximum<input name="participantsMax" type="number" min="1" max="999" inputMode="numeric" required /><ErrorMessage state={state} name="participantsMax" /></label>
+        <label>Minimum<input name="participantsMin" type="number" min="1" max="999" inputMode="numeric" defaultValue={activity?.participantsMin} required /><ErrorMessage state={state} name="participantsMin" /></label>
+        <label>Maximum<input name="participantsMax" type="number" min="1" max="999" inputMode="numeric" defaultValue={activity?.participantsMax} required /><ErrorMessage state={state} name="participantsMax" /></label>
       </div></fieldset>
 
       <div className={styles.twoColumns}>
-        <div className={styles.field}><FieldHeading htmlFor="durationMinutes" help="Obligatoire. Saisis la durée en minutes, de 5 à 1 440.">Durée estimée</FieldHeading><input id="durationMinutes" name="durationMinutes" type="number" min="5" max="1440" inputMode="numeric" placeholder="45 min" required /><ErrorMessage state={state} name="durationMinutes" /></div>
-        <div className={styles.field}><FieldHeading htmlFor="environment" help="Obligatoire. Indique si l’activité se déroule en intérieur, en extérieur ou dans les deux.">Environnement</FieldHeading><select id="environment" name="environment" defaultValue="both"><option value="indoor">Intérieur</option><option value="outdoor">Extérieur</option><option value="both">Les deux</option></select></div>
+        <div className={styles.field}><FieldHeading htmlFor="durationMinutes" help="Obligatoire. Saisis la durée en minutes, de 5 à 1 440.">Durée estimée</FieldHeading><input id="durationMinutes" name="durationMinutes" type="number" min="5" max="1440" inputMode="numeric" placeholder="45 min" defaultValue={activity?.durationMinutes} required /><ErrorMessage state={state} name="durationMinutes" /></div>
+        <div className={styles.field}><FieldHeading htmlFor="environment" help="Obligatoire. Indique si l’activité se déroule en intérieur, en extérieur ou dans les deux.">Environnement</FieldHeading><select id="environment" name="environment" defaultValue={activity?.environment ?? "both"}><option value="indoor">Intérieur</option><option value="outdoor">Extérieur</option><option value="both">Les deux</option></select></div>
       </div>
 
       <BubblePicker
@@ -225,6 +247,7 @@ export function ActivityForm({ categories }: { categories: Category[] }) {
         hint="Touche les objectifs travaillés par l’activité ou ajoute les tiens."
         name="objectives"
         options={pedagogicalObjectives}
+        initialSelected={activity?.objectives}
         state={state}
       />
       <BubblePicker
@@ -232,18 +255,19 @@ export function ActivityForm({ categories }: { categories: Category[] }) {
         hint="Sélectionne tout ce qu’il faut prévoir ou ajoute tes propres mots."
         name="equipment"
         options={equipmentItems}
+        initialSelected={activity?.equipment}
         state={state}
       />
-      <div className={styles.field}><FieldHeading htmlFor="preparation" help="Obligatoire. Décris les préparatifs, les règles et les étapes dans l’ordre, en 10 à 5 000 caractères.">Préparation et déroulement</FieldHeading><textarea id="preparation" name="preparation" rows={8} maxLength={5000} placeholder="Explique les préparatifs, les règles puis les étapes dans l’ordre." required /><ErrorMessage state={state} name="preparation" /></div>
-      <div className={styles.field}><FieldHeading htmlFor="safety" help="Obligatoire. Précise les risques, les règles de sécurité et les adaptations nécessaires, en 5 à 3 000 caractères.">Sécurité et points de vigilance</FieldHeading><textarea id="safety" name="safety" rows={4} maxLength={3000} placeholder="Précise les risques, les règles de sécurité et les adaptations nécessaires." required /><ErrorMessage state={state} name="safety" /></div>
+      <div className={styles.field}><FieldHeading htmlFor="preparation" help="Obligatoire. Décris les préparatifs, les règles et les étapes dans l’ordre, en 10 à 5 000 caractères.">Préparation et déroulement</FieldHeading><textarea id="preparation" name="preparation" rows={8} maxLength={5000} placeholder="Explique les préparatifs, les règles puis les étapes dans l’ordre." defaultValue={activity?.preparation} required /><ErrorMessage state={state} name="preparation" /></div>
+      <div className={styles.field}><FieldHeading htmlFor="safety" help="Obligatoire. Précise les risques, les règles de sécurité et les adaptations nécessaires, en 5 à 3 000 caractères.">Sécurité et points de vigilance</FieldHeading><textarea id="safety" name="safety" rows={4} maxLength={3000} placeholder="Précise les risques, les règles de sécurité et les adaptations nécessaires." defaultValue={activity?.safety} required /><ErrorMessage state={state} name="safety" /></div>
 
       <fieldset className={styles.visibility}><legend><span>Qui peut voir cette activité&nbsp;?</span><InfoTip text="Obligatoire. Choisis privée ou publique ; tu pourras modifier ce choix plus tard." /></legend>
-        <label><input type="radio" name="visibility" value="private" defaultChecked /><span><strong>Privée</strong><small>Uniquement dans ma galerie</small></span></label>
-        <label><input type="radio" name="visibility" value="public" /><span><strong>Publique</strong><small>Visible par la communauté</small></span></label>
+        <label><input type="radio" name="visibility" value="private" defaultChecked={!activity || activity.visibility === "private"} /><span><strong>Privée</strong><small>Uniquement dans ma galerie</small></span></label>
+        <label><input type="radio" name="visibility" value="public" defaultChecked={activity?.visibility === "public"} /><span><strong>Publique</strong><small>Visible par la communauté</small></span></label>
       </fieldset>
 
       {state.message && <p role="alert" className={styles.formError}>{state.message}</p>}
-      <div className={styles.formActions}><Link href="/activites">Annuler</Link><button type="submit" disabled={pending}>{pending ? "Enregistrement…" : "Créer l’activité"}</button></div>
+      <div className={styles.formActions}><Link href={activity ? `/activites/${activity.id}` : "/activites"}>Annuler</Link><button type="submit" disabled={pending}>{pending ? "Enregistrement…" : activity ? "Enregistrer" : "Créer l’activité"}</button></div>
     </form>
   );
 }

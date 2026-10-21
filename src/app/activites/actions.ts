@@ -12,6 +12,25 @@ export type ActivityActionState = {
   errors?: Record<string, string[]>;
 };
 
+function activityFromFormData(formData: FormData) {
+  return {
+    title: formData.get("title"),
+    description: formData.get("description"),
+    categoryId: formData.get("categoryId"),
+    ageMin: formData.get("ageMin"),
+    ageMax: formData.get("ageMax"),
+    participantsMin: formData.get("participantsMin"),
+    participantsMax: formData.get("participantsMax"),
+    durationMinutes: formData.get("durationMinutes"),
+    environment: formData.get("environment"),
+    objectives: formData.getAll("objectives"),
+    equipment: formData.getAll("equipment"),
+    preparation: formData.get("preparation"),
+    safety: formData.get("safety"),
+    visibility: formData.get("visibility"),
+  };
+}
+
 const tags = z.array(z.string().trim().min(1).max(100)).max(20, "Limite-toi à 20 mots-clés.");
 
 const activitySchema = z.object({
@@ -44,22 +63,7 @@ export async function createActivityAction(
 ): Promise<ActivityActionState> {
   await requireUser();
 
-  const parsed = activitySchema.safeParse({
-    title: formData.get("title"),
-    description: formData.get("description"),
-    categoryId: formData.get("categoryId"),
-    ageMin: formData.get("ageMin"),
-    ageMax: formData.get("ageMax"),
-    participantsMin: formData.get("participantsMin"),
-    participantsMax: formData.get("participantsMax"),
-    durationMinutes: formData.get("durationMinutes"),
-    environment: formData.get("environment"),
-    objectives: formData.getAll("objectives"),
-    equipment: formData.getAll("equipment"),
-    preparation: formData.get("preparation"),
-    safety: formData.get("safety"),
-    visibility: formData.get("visibility"),
-  });
+  const parsed = activitySchema.safeParse(activityFromFormData(formData));
 
   if (!parsed.success) {
     return errorState("Vérifie les champs du formulaire.", parsed.error.flatten().fieldErrors);
@@ -94,6 +98,51 @@ export async function createActivityAction(
 
   revalidatePath("/activites");
   redirect("/activites?vue=mes&creation=ok");
+}
+
+export async function updateActivityAction(
+  _state: ActivityActionState,
+  formData: FormData,
+): Promise<ActivityActionState> {
+  await requireUser();
+  const activityId = z.string().uuid().safeParse(formData.get("activityId"));
+  const parsed = activitySchema.safeParse(activityFromFormData(formData));
+
+  if (!activityId.success || !parsed.success) {
+    return errorState(
+      "Vérifie les champs du formulaire.",
+      parsed.success ? undefined : parsed.error.flatten().fieldErrors,
+    );
+  }
+
+  const activity = parsed.data;
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("update_activity_with_tags", {
+    p_activity_id: activityId.data,
+    p_category_id: activity.categoryId,
+    p_title: activity.title,
+    p_description: activity.description,
+    p_age_min: activity.ageMin,
+    p_age_max: activity.ageMax,
+    p_participants_min: activity.participantsMin,
+    p_participants_max: activity.participantsMax,
+    p_duration_minutes: activity.durationMinutes,
+    p_environment: activity.environment,
+    p_preparation: activity.preparation,
+    p_safety: activity.safety,
+    p_visibility: activity.visibility,
+    p_objectives: activity.objectives,
+    p_equipment: activity.equipment,
+  });
+
+  if (error) {
+    console.error("Activity update failed", { code: error.code, message: error.message, details: error.details });
+    return errorState("Les modifications n’ont pas pu être enregistrées.");
+  }
+
+  revalidatePath("/activites");
+  revalidatePath(`/activites/${activityId.data}`);
+  redirect(`/activites/${activityId.data}?modification=ok`);
 }
 
 export async function copyActivityAction(formData: FormData) {
