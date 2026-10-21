@@ -142,6 +142,10 @@ export type Database = {
         Returns: string;
       };
       copy_public_activity: { Args: { p_source_id: string }; Returns: string };
+      get_activity_authors: {
+        Args: { p_activity_ids: string[] };
+        Returns: { id: string; username: string }[];
+      };
       update_activity_with_tags: {
         Args: {
           p_activity_id: string;

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "../../compte/app-shell";
-import { getActivityTags } from "../activity-data";
+import { getActivityAuthors, getActivityTags } from "../activity-data";
 import styles from "../activities.module.css";
 
 type Params = Promise<{ id: string }>;
@@ -27,11 +27,12 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
   const { data: activity } = await supabase.from("activities").select("*").eq("id", id).is("deleted_at", null).maybeSingle();
   if (!activity) notFound();
 
-  const [{ data: category }, tags] = await Promise.all([
+  const [{ data: category }, tags, authorNames] = await Promise.all([
     activity.category_id
       ? supabase.from("categories").select("name").eq("id", activity.category_id).maybeSingle()
       : Promise.resolve({ data: null }),
     getActivityTags(supabase, id),
+    getActivityAuthors(supabase, [id]),
   ]);
   const isOwner = activity.author_id === user.id;
 
@@ -42,6 +43,7 @@ async function ActivityDetail({ params, searchParams }: { params: Params; search
       <article className={styles.detail}>
         <div className={styles.cardTopline}><span>{category?.name ?? "Sans catégorie"}</span><b>{activity.visibility === "public" ? "Publique" : "Privée"}</b></div>
         <h1>{activity.title}</h1>
+        <p className={styles.detailAuthor}>Une activité proposée par <strong>@{authorNames.get(activity.author_id) ?? "membre"}</strong></p>
         <p className={styles.detailDescription}>{activity.description}</p>
         <div className={styles.detailMeta}>
           <div><small>Âge</small><strong>{activity.age_min}–{activity.age_max} ans</strong></div>

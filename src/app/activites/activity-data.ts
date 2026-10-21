@@ -27,3 +27,24 @@ export async function getActivityTags(
     equipment: (equipment ?? []).map((item) => item.name),
   };
 }
+
+export async function getActivityAuthors(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  activityIds: string[],
+) {
+  if (!activityIds.length) return new Map<string, string>();
+
+  const { data, error } = await supabase.rpc("get_activity_authors", {
+    p_activity_ids: activityIds,
+  });
+
+  if (error) {
+    console.error("Activity authors could not be loaded", {
+      code: error.code,
+      message: error.message,
+    });
+    return new Map<string, string>();
+  }
+
+  return new Map((data ?? []).map((author) => [author.id, author.username]));
+}

@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "../compte/app-shell";
 import { copyActivityAction } from "./actions";
+import { getActivityAuthors } from "./activity-data";
 import styles from "./activities.module.css";
 
 type SearchParams = Promise<{
@@ -35,13 +36,14 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
   let activitiesQuery = supabase.from("activities").select("*").is("deleted_at", null).order("created_at", { ascending: false });
   activitiesQuery = community
     ? activitiesQuery.eq("visibility", "public")
-    : activitiesQuery.eq("author_id", user.id).eq("visibility", "private");
+    : activitiesQuery.eq("author_id", user.id);
 
   const [{ data: activities }, { data: categories }] = await Promise.all([
     activitiesQuery,
     supabase.from("categories").select("id,name").order("name"),
   ]);
   const categoryNames = new Map((categories ?? []).map((category) => [category.id, category.name]));
+  const authorNames = await getActivityAuthors(supabase, (activities ?? []).map((activity) => activity.id));
   const search = (params.q ?? "").trim().slice(0, 80);
   const categoryFilter = params.categorie ?? "";
   const environmentFilter = params.environnement ?? "";
@@ -99,6 +101,7 @@ async function ActivitiesContent({ searchParams }: { searchParams: SearchParams 
             <Link href={`/activites/${activity.id}`} className={styles.cardLink} aria-label={`Consulter ${activity.title}`}>
               <div className={styles.cardTopline}><span>{categoryNames.get(activity.category_id ?? "") ?? "Sans catégorie"}</span><b>{activity.visibility === "public" ? "Publique" : "Privée"}</b></div>
               <h2>{activity.title}</h2>
+              <p className={styles.author}>Par @{authorNames.get(activity.author_id) ?? "membre"}</p>
               {activity.description && <p>{activity.description}</p>}
               <div className={styles.cardMeta}>
                 {activity.age_min != null && activity.age_max != null && <span>{activity.age_min}–{activity.age_max} ans</span>}

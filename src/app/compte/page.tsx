@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import animixLogo from "../../../logo-animix.png";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { getActivityAuthors } from "../activites/activity-data";
 import { BottomNavigation } from "./bottom-navigation";
 import styles from "./home.module.css";
 
@@ -33,6 +34,7 @@ async function Home() {
   ]);
 
   const username = profile?.username ?? user.user_metadata?.username ?? "";
+  const authorNames = await getActivityAuthors(supabase, (recentActivities ?? []).map((activity) => activity.id));
   const categoryNames = new Map((categories ?? []).map((category) => [category.id, category.name]));
   const activityImages = ["/images/cards/activite-fresque.webp", "/images/cards/activite-explorateurs.webp"];
   const environmentNames = { indoor: "Intérieur", outdoor: "Extérieur", both: "Intérieur/extérieur" };
@@ -67,6 +69,7 @@ async function Home() {
                       {activity.environment && <span>{environmentNames[activity.environment]}</span>}
                     </div>
                     <h3>{activity.title}</h3>
+                    <span className={styles.activityAuthor}>Par @{authorNames.get(activity.author_id) ?? "membre"}</span>
                     <p>{activity.description}</p>
                     <div className={styles.meta}>
                       {activity.duration_minutes && <span>⏱ {activity.duration_minutes} min</span>}
