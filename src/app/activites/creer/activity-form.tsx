@@ -47,6 +47,37 @@ function ErrorMessage({ state, name }: { state: ActivityActionState; name: strin
   return message ? <p className={styles.fieldError}>{message}</p> : null;
 }
 
+function InfoTip({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <span className={styles.infoTip}>
+      <button
+        type="button"
+        aria-label="Afficher l’aide"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+        onBlur={() => setOpen(false)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") setOpen(false);
+        }}
+      >
+        i
+      </button>
+      {open && <span role="status" className={styles.infoPopover}>{text}</span>}
+    </span>
+  );
+}
+
+function FieldHeading({ htmlFor, children, help }: { htmlFor: string; children: string; help: string }) {
+  return (
+    <span className={styles.fieldHeading}>
+      <label htmlFor={htmlFor}>{children}</label>
+      <InfoTip text={help} />
+    </span>
+  );
+}
+
 function BubblePicker({
   legend,
   hint,
@@ -110,8 +141,7 @@ function BubblePicker({
 
   return (
     <fieldset className={styles.bubblePicker}>
-      <legend>{legend}</legend>
-      <p>{hint}</p>
+      <legend><span>{legend}</span><InfoTip text={`${hint} Facultatif, 20 choix maximum et 100 caractères par mot.`} /></legend>
       <div className={styles.bubbleCloud}>
         {allOptions.map((option) => (
           <label key={option} className={styles.bubbleChoice}>
@@ -142,11 +172,9 @@ function BubblePicker({
           maxLength={100}
           placeholder={name === "objectives" ? "Ajouter un objectif" : "Ajouter du matériel"}
           aria-label={name === "objectives" ? "Nouvel objectif pédagogique" : "Nouveau matériel"}
-          aria-describedby={`${name}-custom-help`}
         />
         <button type="button" onClick={addCustomOption} aria-label="Ajouter ce mot">+</button>
       </div>
-      <small id={`${name}-custom-help`} className={styles.pickerHelp}>Facultatif · 20 choix maximum · 100 caractères par mot</small>
       {customError && <p role="alert" className={styles.fieldError}>{customError}</p>}
       <ErrorMessage state={state} name={name} />
     </fieldset>
@@ -158,23 +186,23 @@ export function ActivityForm({ categories }: { categories: Category[] }) {
 
   return (
     <form action={action} className={styles.form} aria-busy={pending} noValidate>
-      <label className={styles.field}>Titre<input name="title" maxLength={180} placeholder="Ex. La fresque des émotions" required /><small>Obligatoire · entre 3 et 180 caractères</small><ErrorMessage state={state} name="title" /></label>
-      <label className={styles.field}>Description<textarea name="description" rows={4} maxLength={1500} placeholder="Résume le principe de l’activité et ce que les participants vont faire." required /><small>Obligatoire · entre 10 et 1 500 caractères</small><ErrorMessage state={state} name="description" /></label>
-      <label className={styles.field}>Catégorie<select name="categoryId" defaultValue="" required><option value="" disabled>Choisir une catégorie</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select><small>Obligatoire · choisis la catégorie qui décrit le mieux l’activité</small><ErrorMessage state={state} name="categoryId" /></label>
+      <div className={styles.field}><FieldHeading htmlFor="title" help="Obligatoire. Entre 3 et 180 caractères.">Titre</FieldHeading><input id="title" name="title" maxLength={180} placeholder="Ex. La fresque des émotions" required /><ErrorMessage state={state} name="title" /></div>
+      <div className={styles.field}><FieldHeading htmlFor="description" help="Obligatoire. Résume le principe de l’activité en 10 à 1 500 caractères.">Description</FieldHeading><textarea id="description" name="description" rows={4} maxLength={1500} placeholder="Résume le principe de l’activité et ce que les participants vont faire." required /><ErrorMessage state={state} name="description" /></div>
+      <div className={styles.field}><FieldHeading htmlFor="categoryId" help="Obligatoire. Choisis la catégorie qui décrit le mieux l’activité.">Catégorie</FieldHeading><select id="categoryId" name="categoryId" defaultValue="" required><option value="" disabled>Choisir une catégorie</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select><ErrorMessage state={state} name="categoryId" /></div>
 
-      <fieldset className={styles.group}><legend>Tranche d’âge</legend><p className={styles.groupHint}>Obligatoire · indique l’âge du public, entre 0 et 99 ans</p><div className={styles.twoColumns}>
+      <fieldset className={styles.group}><legend><span>Tranche d’âge</span><InfoTip text="Obligatoire. Indique l’âge minimum et maximum du public, entre 0 et 99 ans." /></legend><div className={styles.twoColumns}>
         <label>Minimum<input name="ageMin" type="number" min="0" max="99" inputMode="numeric" placeholder="6" required /><ErrorMessage state={state} name="ageMin" /></label>
         <label>Maximum<input name="ageMax" type="number" min="0" max="99" inputMode="numeric" placeholder="10" required /><ErrorMessage state={state} name="ageMax" /></label>
       </div></fieldset>
 
-      <fieldset className={styles.group}><legend>Nombre de participants</legend><p className={styles.groupHint}>Obligatoire · indique l’effectif conseillé, entre 1 et 999</p><div className={styles.twoColumns}>
+      <fieldset className={styles.group}><legend><span>Nombre de participants</span><InfoTip text="Obligatoire. Indique l’effectif minimum et maximum conseillé, entre 1 et 999 personnes." /></legend><div className={styles.twoColumns}>
         <label>Minimum<input name="participantsMin" type="number" min="1" max="999" inputMode="numeric" placeholder="6" required /><ErrorMessage state={state} name="participantsMin" /></label>
         <label>Maximum<input name="participantsMax" type="number" min="1" max="999" inputMode="numeric" placeholder="16" required /><ErrorMessage state={state} name="participantsMax" /></label>
       </div></fieldset>
 
       <div className={styles.twoColumns}>
-        <label className={styles.field}>Durée estimée<input name="durationMinutes" type="number" min="5" max="1440" inputMode="numeric" placeholder="45 min" required /><small>Obligatoire · en minutes, de 5 à 1 440</small><ErrorMessage state={state} name="durationMinutes" /></label>
-        <label className={styles.field}>Environnement<select name="environment" defaultValue="both"><option value="indoor">Intérieur</option><option value="outdoor">Extérieur</option><option value="both">Les deux</option></select><small>Obligatoire · lieu adapté à l’activité</small></label>
+        <div className={styles.field}><FieldHeading htmlFor="durationMinutes" help="Obligatoire. Saisis la durée en minutes, de 5 à 1 440.">Durée estimée</FieldHeading><input id="durationMinutes" name="durationMinutes" type="number" min="5" max="1440" inputMode="numeric" placeholder="45 min" required /><ErrorMessage state={state} name="durationMinutes" /></div>
+        <div className={styles.field}><FieldHeading htmlFor="environment" help="Obligatoire. Indique si l’activité se déroule en intérieur, en extérieur ou dans les deux.">Environnement</FieldHeading><select id="environment" name="environment" defaultValue="both"><option value="indoor">Intérieur</option><option value="outdoor">Extérieur</option><option value="both">Les deux</option></select></div>
       </div>
 
       <BubblePicker
@@ -191,11 +219,10 @@ export function ActivityForm({ categories }: { categories: Category[] }) {
         options={equipmentItems}
         state={state}
       />
-      <label className={styles.field}>Préparation et déroulement<textarea name="preparation" rows={8} maxLength={5000} placeholder="Explique les préparatifs, les règles puis les étapes dans l’ordre." required /><small>Obligatoire · entre 10 et 5 000 caractères</small><ErrorMessage state={state} name="preparation" /></label>
-      <label className={styles.field}>Sécurité et points de vigilance<textarea name="safety" rows={4} maxLength={3000} placeholder="Précise les risques, les règles de sécurité et les adaptations nécessaires." required /><small>Obligatoire · entre 5 et 3 000 caractères</small><ErrorMessage state={state} name="safety" /></label>
+      <div className={styles.field}><FieldHeading htmlFor="preparation" help="Obligatoire. Décris les préparatifs, les règles et les étapes dans l’ordre, en 10 à 5 000 caractères.">Préparation et déroulement</FieldHeading><textarea id="preparation" name="preparation" rows={8} maxLength={5000} placeholder="Explique les préparatifs, les règles puis les étapes dans l’ordre." required /><ErrorMessage state={state} name="preparation" /></div>
+      <div className={styles.field}><FieldHeading htmlFor="safety" help="Obligatoire. Précise les risques, les règles de sécurité et les adaptations nécessaires, en 5 à 3 000 caractères.">Sécurité et points de vigilance</FieldHeading><textarea id="safety" name="safety" rows={4} maxLength={3000} placeholder="Précise les risques, les règles de sécurité et les adaptations nécessaires." required /><ErrorMessage state={state} name="safety" /></div>
 
-      <fieldset className={styles.visibility}><legend>Qui peut voir cette activité&nbsp;?</legend>
-        <p className={styles.visibilityHint}>Obligatoire · tu pourras modifier ce choix plus tard</p>
+      <fieldset className={styles.visibility}><legend><span>Qui peut voir cette activité&nbsp;?</span><InfoTip text="Obligatoire. Choisis privée ou publique ; tu pourras modifier ce choix plus tard." /></legend>
         <label><input type="radio" name="visibility" value="private" defaultChecked /><span><strong>Privée</strong><small>Uniquement dans ma galerie</small></span></label>
         <label><input type="radio" name="visibility" value="public" /><span><strong>Publique</strong><small>Visible par la communauté</small></span></label>
       </fieldset>
