@@ -33,7 +33,7 @@ async function CategoryList() {
 export default function CategoriesPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
-      <p className="text-sm font-semibold text-teal-700">Asobi</p>
+      <p className="text-sm font-semibold text-teal-700">Animix</p>
       <h1 className="mt-3 text-3xl font-bold">Les catégories d’activités</h1>
       <Suspense fallback={<p className="mt-6">Chargement des catégories…</p>}>
         <CategoryList />

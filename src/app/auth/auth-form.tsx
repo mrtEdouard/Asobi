@@ -77,7 +77,7 @@ function PasswordField({
     </div>
   );
 }
-
+// Calcul si t'as bien minimum 16 ans (sert aussi pour déterminer si tu as droit à la discussion ou pas)
 function calculateMaximumBirthDate() {
   const date = new Date();
   date.setFullYear(date.getFullYear() - 16);
@@ -178,8 +178,8 @@ function Notice({ state }: { state: AuthFormState }) {
   return <p role={state.status === "error" ? "alert" : "status"} className={`${styles.notice} ${state.status === "error" ? styles.noticeError : styles.noticeSuccess}`}>{state.message}</p>;
 }
 
-function AsobiLogo() {
-  return <Image className={styles.logo} src={logoImage} alt="Asobi" priority sizes="300px" />;
+function AnimixLogo() {
+  return <Image className={styles.logo} src={logoImage} alt="Animix" priority sizes="300px" />;
 }
 
 function AuthShell({ title, children, compact = false }: { title: string; children: React.ReactNode; compact?: boolean }) {
@@ -188,7 +188,7 @@ function AuthShell({ title, children, compact = false }: { title: string; childr
       <section className={`${styles.phone} ${compact ? styles.compactPhone : ""}`}>
         <header className={styles.brand}>
           <div className={styles.logoCrop}>
-            <AsobiLogo />
+            <AnimixLogo />
           </div>
           <span className={styles.headerSeparator} aria-hidden="true" />
           <p>L’animation à portée de main</p>

@@ -1,0 +1,50 @@
+.viewport { min-height: 100svh; background: #252525; color: #08273a; }
+.phone { position: relative; width: min(100%, 430px); min-height: 100svh; margin: 0 auto; overflow: hidden; background: #fff; box-shadow: 0 0 60px rgba(0,0,0,.18); }
+.content { padding: 22px 20px 126px; }
+.header { display: flex; align-items: center; justify-content: center; min-height: 86px; }
+.logo { width: 224px; height: auto; }
+.welcome { margin-top: 30px; }
+.welcome > p:first-child { color: #64727a; font-size: 15px; font-weight: 650; }
+.welcome h1 { margin-top: 2px; font-size: clamp(29px,8vw,36px); font-weight: 850; letter-spacing: -.045em; line-height: 1.12; }
+.welcome h1 span { display: inline-block; font-size: .75em; transform: rotate(-8deg); }
+.intro { margin-top: 8px; color: #64727a; font-size: 15px; }
+.section { margin-top: 34px; }
+.sectionHeading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.eyebrow { margin-bottom: 3px; color: #0b9997; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.sectionHeading h2 { max-width: 255px; font-size: 21px; font-weight: 820; letter-spacing: -.035em; line-height: 1.15; }
+.seeAll { display: flex; flex: 0 0 auto; align-items: center; gap: 1px; padding: 6px 0; color: #0b7f80; font-size: 12px; font-weight: 750; }
+.seeAll svg, .offerArrow svg { width: 16px; height: 16px; }
+.carousel { display: flex; width: 100%; gap: 10px; overflow-x: auto; overscroll-behavior-inline: contain; padding: 1px 0 14px; scroll-snap-type: inline mandatory; scrollbar-width: none; }
+.carousel::-webkit-scrollbar { display: none; }
+.activityCard { flex: 0 0 calc(50% - 5px); min-width: 0; overflow: hidden; border: 1px solid #dedede; border-radius: 17px; background: #ededed; box-shadow: 0 8px 20px rgba(0,0,0,.07); scroll-snap-align: start; }
+.activityVisual { position: relative; height: 104px; overflow: hidden; background: #dbe6e4; }
+.cardImage { object-fit: cover; }
+.activityBadge { position: absolute; top: 8px; right: 8px; padding: 4px 7px; border-radius: 999px; background: rgba(255,255,255,.94); color: #08273a; font-size: 9px; font-weight: 800; }
+.cardBody { padding: 11px 11px 13px; background: #fff; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags span { padding: 4px 6px; border-radius: 999px; background: #e9f6f4; color: #087f80; font-size: 8px; font-weight: 800; }
+.cardBody h3, .offerCard h3 { margin-top: 8px; font-size: 14px; font-weight: 820; letter-spacing: -.025em; line-height: 1.2; }
+.cardBody > p { display: -webkit-box; margin-top: 5px; overflow: hidden; color: #627079; font-size: 10px; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.meta { display: flex; flex-wrap: wrap; gap: 5px 10px; margin-top: 10px; color: #42545e; font-size: 9px; font-weight: 700; }
+.offerCard { position: relative; display: flex; flex: 0 0 calc(50% - 5px); min-width: 0; min-height: 238px; flex-direction: column; align-items: flex-start; overflow: hidden; padding: 0 12px 12px; border: 1px solid #d9d9d9; border-radius: 17px; background: #ededed; box-shadow: 0 8px 20px rgba(0,0,0,.07); scroll-snap-align: start; }
+.offerVisual { position: relative; width: calc(100% + 24px); height: 92px; margin-inline: -12px; overflow: hidden; background: #dbe6e4; }
+.offerContent { width: 100%; }
+.offerTopline { display: flex; min-height: 27px; align-items: flex-end; margin-top: 9px; color: #708089; font-size: 9px; font-weight: 750; line-height: 1.25; }
+.offerTopline b { position: absolute; top: 101px; right: 10px; padding: 3px 5px; border-radius: 999px; background: rgba(255,255,255,.88); color: #f15d48; font-size: 7px; text-transform: uppercase; }
+.offerCard h3 { margin-top: 4px; font-size: 13px; }
+.offerContent > p { margin: 4px 0 9px; color: #697982; font-size: 9px; line-height: 1.35; }
+.offerArrow { position: absolute; right: 9px; bottom: 10px; color: #0b7f80; }
+.bottomNav { position: fixed; z-index: 10; bottom: 0; left: 50%; width: min(100%,430px); transform: translateX(-50%); display: grid; grid-template-columns: 1fr 1fr 68px 1fr 1fr; align-items: end; min-height: 78px; padding: 9px 10px max(9px,env(safe-area-inset-bottom)); border-top: 1px solid #11091a; background: #08010e; box-shadow: 0 -12px 30px rgba(0,0,0,.16); }
+.navItem { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 5px; padding: 5px 2px; color: #a9a5ae; font-size: 9px; font-weight: 720; }
+.navItem svg { width: 23px; height: 23px; }
+.navItem.active { color: #fff; }
+.createButton { display: grid; width: 62px; height: 62px; place-self: start center; place-items: center; margin-top: -40px; border: 4px solid transparent; border-radius: 50%; background: linear-gradient(#08010e, #08010e) padding-box, linear-gradient(to bottom, transparent 0 50%, #fff 50% 100%) border-box; color: #fff; box-shadow: 0 9px 20px rgba(0,0,0,.28); }
+.createButton svg { width: 25px; height: 25px; stroke-width: 2.2; }
+.loading { display: grid; min-height: 100svh; place-items: center; background: #fff; color: #08273a; font-size: 14px; font-weight: 750; }
+@media (max-width: 360px) { .content { padding-inline: 16px; } .logo { width: 175px; } .sectionHeading h2 { font-size: 19px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .activityCard, .offerCard, .navItem, .createButton, .seeAll { transition: transform 160ms ease,box-shadow 160ms ease,color 160ms ease; }
+  .activityCard:hover, .offerCard:hover { transform: translateY(-2px); box-shadow: 0 18px 38px rgba(8,39,58,.12); }
+  .createButton:hover { transform: translateY(-2px) rotate(3deg); }
+}
+@media (min-width: 431px) { .phone { border-inline: 1px solid rgba(8,39,58,.08); } }

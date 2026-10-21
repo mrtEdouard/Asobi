@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Asobi — la communauté de l’animation",
+  title: "Animix — la communauté de l’animation",
   description: "Créez, organisez et partagez des activités d’animation.",
 };
 

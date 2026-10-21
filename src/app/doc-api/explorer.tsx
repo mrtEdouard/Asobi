@@ -213,7 +213,7 @@ export default function ApiExplorer() {
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
-        <Link href="/" className={styles.brand}>asobi<span>API LAB</span></Link>
+        <Link href="/" className={styles.brand}>animix<span>API LAB</span></Link>
         <p className={styles.caption}>EXPLORATEUR DE DONNÉES</p>
         <input aria-label="Rechercher une table" placeholder="Rechercher une table…" value={search} onChange={e => setSearch(e.target.value)} />
         <button className={styles.secondary} disabled={busy} onClick={inspectSchema}>↻ Inspecter la base</button>
@@ -226,7 +226,7 @@ export default function ApiExplorer() {
       </aside>
 
       <main className={styles.main}>
-        <header className={styles.header}><div><p className={styles.caption}>DOCUMENTATION INTERACTIVE</p><h1>Le laboratoire d’Asobi<span>.</span></h1><p>Explore les tables, construis une requête et inspecte la réponse réelle de Supabase.</p></div><span className={styles.badge}>{user ? "SESSION CONNECTÉE" : "VISITEUR"}</span></header>
+        <header className={styles.header}><div><p className={styles.caption}>DOCUMENTATION INTERACTIVE</p><h1>Le laboratoire d’Animix<span>.</span></h1><p>Explore les tables, construis une requête et inspecte la réponse réelle de Supabase.</p></div><span className={styles.badge}>{user ? "SESSION CONNECTÉE" : "VISITEUR"}</span></header>
         <div className={styles.notice}>Les requêtes touchent la vraie base. Les droits SQL et RLS du compte connecté s’appliquent ; ce panneau ne donne aucun privilège administrateur. Une réponse vide peut signifier qu’aucune ligne n’est visible.</div>
 
         <section className={styles.card} aria-labelledby="session-title"><div className={styles.sectionHead}><h2 id="session-title">01 · Session utilisateur</h2><span className={styles.small}>Supabase Auth</span></div>

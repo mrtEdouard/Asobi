@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+
+//Zod sert à la validation des données , on y définit les règles de ce qu'on veut avoir
 const email = z
   .string()
   .trim()
